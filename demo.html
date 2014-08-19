@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>more-routing</title>
+<head>
+  <title>more-routing</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <script src="../platform/platform.js"></script>
-    <link rel="import" href="../core-scaffold/core-scaffold.html">
+  <script src="../platform/platform.js"></script>
+  <link rel="import" href="../core-scaffold/core-scaffold.html">
 
-    <link rel="import" href="more-router.html">
-    <link rel="import" href="more-route.html">
+  <link rel="import" href="more-router.html">
+  <link rel="import" href="more-route.html">
 
-    <style>
-      core-scaffold nav a {
-        display: block;
-        padding: 0.5em;
-      }
-    </style>
-  </head>
-  <body>
-    <core-scaffold>
+  <style>
+    core-scaffold nav a {
+      display: block;
+      padding: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <core-scaffold>
 
-      <header tool>more-routing</header>
+    <header tool>more-routing</header>
 
-      <nav>
-        <a href="#">/</a>
-        <a href="#users/1">/users/1</a>
-        <a href="#users/1/details">/users/1/details</a>
-        <a href="#users/2">/users/2</a>
-        <a href="#users/2/details">/users/2/details</a>
-      </nav>
+    <nav>
+      <a href="#">/</a>
+      <a href="#users/1">/users/1</a>
+      <a href="#users/1/details">/users/1/details</a>
+      <a href="#users/2">/users/2</a>
+      <a href="#users/2/details">/users/2/details</a>
+    </nav>
 
-      <more-router>
-        <template is="more-route" route="/users/:userId">
-          <p>User page for user {{params.userId}}.</p>
-          <template is="more-route" route="/details">
-            Details for user {{params.userId}}.
-          </template>
+    <more-router>
+      <template is="more-route" route="/users/:userId">
+        <p>User page for user {{params.userId}}.</p>
+        <template is="more-route" route="/details">
+          Details for user {{params.userId}}.
         </template>
+      </template>
 
-        <template is="more-route" route="/">
-          <p>Ohai, it's the index and stuff.</p>
-        </template>
-      </more-router>
+      <template is="more-route" route="/">
+        <p>Ohai, it's the index and stuff.</p>
+      </template>
+    </more-router>
 
-    </core-scaffold>
-  </body>
+  </core-scaffold>
+</body>
 </html>
