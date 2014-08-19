@@ -22,7 +22,7 @@ other URL would display "This is the index!".
 <polymer-element name="more-router">
   <script>
     Polymer('more-router', {
-      created: function() {
+      ready: function() {
         this._routes = [];
         // TODO(nevir): Handle dynamically added routes.
         for (var i = 0, node; node = this.children[i]; i++) {

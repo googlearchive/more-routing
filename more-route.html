@@ -11,19 +11,27 @@ expanded into path based routing in the future (by declaring mount points).
 
 ## Binding to Params
 
-    <more-route route="forums/:forumId/:postId" params="{{params}}"></more-route>
+    <template is="more-route" route="forums/:forumId/:postId" params="{{params}}"></template>
 
 This example would make `params.forumId` and `params.postId` available.
 
 
 ## Routes as Conditionals
 
-    <template is="more-route" route="users/:userId">
+    <template is="more-route" route="users/:userId" name="user">
       The current user is {{params.userId}}.
     </template>
 
 `more-route` can also be treated as a conditional template, where its contents
 are evaluated when the route applies, and removed from the DOM otherwise.
+
+
+## Named Routes
+
+Furthermore, routes with just a `name` will proxy their values to the named
+`more-route` that also declares a `route`:
+
+    <template is="more-route" name="user"></template>
 
 
 ## Route Expressions
@@ -47,8 +55,15 @@ Routes will match any URL where they fully satisfy the URL, or a prefix of the
 URL. I.e. `users/:userId` matches `users/1` as well as `users/1/details`.
 Simimarly, the empty route `/` matches _all_ URLs.
 -->
+<!--
+TODO(nevir): Figure out why we can't use <more-route> for simple route elements
+instead of <template is="more-route">.
+-->
 <polymer-element name="more-route" extends="template">
   <script>
+  (function() {
+    var namedRoutes = {};
+
     Polymer('more-route', {
       publish: {
         /**
@@ -58,6 +73,17 @@ Simimarly, the empty route `/` matches _all_ URLs.
          * @type String
          */
         route: '',
+
+        /**
+         * A unique name for this route.
+         *
+         * If `route` is not present, this element inherits routing information
+         * from the `more-route` that defines it for `name`.
+         *
+         * @attribute name
+         * @type String
+         */
+        name: '',
 
         /**
          * The complete route, including routes that this is contained by.
@@ -78,7 +104,7 @@ Simimarly, the empty route `/` matches _all_ URLs.
         /**
          * Whether the route matches the current URL.
          *
-         * @attributes active
+         * @attribute active
          * @type Boolean
          */
         active: false,
@@ -88,7 +114,7 @@ Simimarly, the empty route `/` matches _all_ URLs.
          *
          * If `autoVisibility` is enabled, this is bound to `active`.
          *
-         * @attributes visible
+         * @attribute visible
          * @type Boolean
          */
         visible: false,
@@ -97,10 +123,21 @@ Simimarly, the empty route `/` matches _all_ URLs.
          * Whether route content should be made visible when the route becomes
          * active.
          *
-         * @attributes autoVisibility
+         * @attribute autoVisibility
          * @type Boolean
          */
         autoVisibility: true,
+
+        /**
+         * Whether this route is a proxy to the primary route with the same
+         * `name`.
+         *
+         * Defaults to `true` when `name` is set, but `route` is not.
+         *
+         * @attribute proxy
+         * @type Boolean
+         */
+        proxy: false,
       },
 
       observe: {
@@ -108,6 +145,7 @@ Simimarly, the empty route `/` matches _all_ URLs.
       },
 
       ready: function() {
+        this.proxy = this.name && !this.route;
         this.model = this;
         this._doEvaluate = this._evaluate.bind(this);
       },
@@ -116,7 +154,28 @@ Simimarly, the empty route `/` matches _all_ URLs.
         this._unregister();
       },
 
+      nameChanged: function(prevName, name) {
+        if (this.route && !this.proxy) {
+          if (namedRoutes[name]) {
+            throw new Error('Named route "' + name + '" is already defined!');
+          }
+          namedRoutes[name] = this;
+          return;
+        }
+
+        this.bind('route',     new PathObserver(namedRoutes[name], 'route'));
+        this.bind('fullRoute', new PathObserver(namedRoutes[name], 'fullRoute'));
+        this.bind('params',    new PathObserver(namedRoutes[name], 'params'));
+        this.bind('active',    new PathObserver(namedRoutes[name], 'active'));
+      },
+
       autoVisibilityChanged: function() {
+        if (this.autoVisibility) {
+          this.visible = this.active;
+        }
+      },
+
+      activeChanged: function() {
         if (this.autoVisibility) {
           this.visible = this.active;
         }
@@ -140,6 +199,7 @@ Simimarly, the empty route `/` matches _all_ URLs.
       },
 
       _compile: function() {
+        if (this.proxy) return;
         var routes = this._routeAncestry().map(function(a) {return a.route});
         this.fullRoute = routes.join('/').replace(/\/+/g, '/');
 
@@ -161,11 +221,13 @@ Simimarly, the empty route `/` matches _all_ URLs.
       },
 
       _register: function() {
+        if (this.proxy) return;
         this._unregister();
         MoreRouting.adaptor.register(this._routeParts, this._doEvaluate);
       },
 
       _unregister: function() {
+        if (this.proxy) return;
         if (this._routeConfig) {
           MoreRouting.adaptor.unregister(this._routeParts, this._doEvaluate);
         }
@@ -192,11 +254,11 @@ Simimarly, the empty route `/` matches _all_ URLs.
       },
 
       _evaluate: function(pathParts) {
-        this.active = !!pathParts;
-        if (this.autoVisibility) {
-          this.visible = this.active;
+        if (this.proxy) {
+          throw new Error('Bug! Proxy route got route update callback!');
         }
 
+        this.active = !!pathParts;
         this.params = {};
         if (!pathParts) return;
 
@@ -208,5 +270,6 @@ Simimarly, the empty route `/` matches _all_ URLs.
         }
       }
     });
+  })();
   </script>
 </polymer-element>
