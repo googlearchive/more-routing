@@ -43,9 +43,9 @@
 
     <more-route-switch>
       <template is="more-route-if" name="user">
-        <header>User: {{params.userId}}</header>
+        <p>User: {{params.userId}}</p>
         <template is="more-route-if" route="/settings">
-          Settings and stuff for user: {{params.userId}}.
+          <p>Settings and stuff for user: {{params.userId}}.</p>
         </template>
       </template>
 
