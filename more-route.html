@@ -67,6 +67,42 @@
         proxy: false,
       },
 
+      /**
+       * Convert `params` into the URL they represent for this route.
+       *
+       * @method urlFor
+       * @param params Object
+       */
+      urlFor: function(params) {
+        var compiled = this._compiled || MoreRouting.getNamedRoute(this.name)._compiled;
+        var parts = compiled.map(function(config) {
+          if (config.param) {
+            if (!params[config.param]) {
+              throw new Error('param "' + config.param + '" is required for route: ' + this.route);
+            }
+            return params[config.param];
+
+          // TODO(nevir): Wildcards aren't very well supported. Fix that.
+          } else if (config.match === true) {
+            return '';
+          } else {
+            return config.match;
+          }
+        });
+
+        return parts.join('/');
+      },
+
+      /**
+       * Navigates to the URL represented by `params`.
+       *
+       * @method navigateTo
+       * @param params Object
+       */
+      navigateTo: function(params) {
+        MoreRouting.adaptor.navigateTo(this.urlFor(params));
+      },
+
       // Lifecycle
 
       ready: function() {

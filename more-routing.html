@@ -26,6 +26,10 @@ MoreRouting.getNamedRoute = function getNamedRoute(name) {
   return route;
 };
 
+MoreRouting.navigateTo = function navigateTo(name, params) {
+  this.getNamedRoute(name).navigateTo(params);
+};
+
 // Parsing & Utility
 
 MoreRouting.compileExpression = function compileExpression(routeExpression) {

@@ -67,6 +67,12 @@ HashAdaptor.prototype.matches = function matches(compiled, params) {
   return true;
 };
 
+HashAdaptor.prototype.navigateTo = function navigateTo(path) {
+  history.pushState({}, '', '#' + path);
+  // TODO(nevir): Why doesn't the pushState fire a hashchange event?
+  this._read();
+};
+
 // Private
 
 HashAdaptor.prototype._bindEvents = function _bindEvents() {
