@@ -1,0 +1,63 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`more-router` manages routes that are exclusive of one another.
+
+The first active route (route that matches the URL) will be visible in the DOM.
+
+## Example:
+
+    <more-router>
+      <template id="more-route" route="users/:userId">
+        You're looking at user {{params.userId}}.
+      </template>
+      <template id="more-route" route="">
+        This is the index!
+      </template>
+    </more-router>
+
+If the URL is 'users/foo', "You're looking at user foo." would be visible. Any
+other URL would display "This is the index!".
+-->
+<polymer-element name="more-router">
+  <script>
+    Polymer('more-router', {
+      created: function() {
+        this._routes = [];
+        // TODO(nevir): Handle dynamically added routes.
+        for (var i = 0, node; node = this.children[i]; i++) {
+          this._manageRoute(node);
+        }
+      },
+
+      attached: function() {
+        this._observer = new CompoundObserver();
+        for (var i = 0, node; node = this._routes[i]; i++) {
+          this._observer.addPath(node, 'active');
+        }
+        this._observer.open(this._update.bind(this));
+      },
+
+      detached: function() {
+        this._observer.close();
+      },
+
+      _manageRoute: function(node) {
+        node.autoVisibility = false;
+        this._routes.push(node);
+      },
+
+      _update: function() {
+        var found = false;
+        for (var i = 0, node; node = this._routes[i]; i++) {
+          if (node.active && !found) {
+            found = true;
+            node.visible = true;
+          } else {
+            node.visible = false;
+          }
+        }
+      },
+    });
+  </script>
+</polymer-element>

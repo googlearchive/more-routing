@@ -1,0 +1,209 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="hash-adaptor.html">
+
+<!--
+`more-route` provides token based routing.
+
+Currently, it only supports hash based routing. The hope is that it can be
+expanded into path based routing in the future (by declaring mount points).
+
+
+## Binding to Params
+
+    <more-route route="forums/:forumId/:postId" params="{{params}}"></more-route>
+
+This example would make `params.forumId` and `params.postId` available.
+
+
+## Routes as Conditionals
+
+    <template is="more-route" route="users/:userId">
+      The current user is {{params.userId}}.
+    </template>
+
+`more-route` can also be treated as a conditional template, where its contents
+are evaluated when the route applies, and removed from the DOM otherwise.
+
+
+## Route Expressions
+
+Route expressions are a series of tokens separated by `/` characters. A leading
+or trailing `/` characters is ignored. Tokens can be:
+
+`:parameters`: Any token beginning with `:` declares a named parameter for
+path parts at that segment of the URL.
+
+`*wildcards`: Any token beginning with `*` is treated as a wildcard. The name is
+not required, but allowed for documentation.
+
+`strings`: Any other token is treated as a static segment of the URL, and must
+exactly match.
+
+
+## Matching Behavior
+
+Routes will match any URL where they fully satisfy the URL, or a prefix of the
+URL. I.e. `users/:userId` matches `users/1` as well as `users/1/details`.
+Simimarly, the empty route `/` matches _all_ URLs.
+-->
+<polymer-element name="more-route" extends="template">
+  <script>
+    Polymer('more-route', {
+      publish: {
+        /**
+         * A routing expression used to parse parameters from the window's URL.
+         *
+         * @attribute route
+         * @type String
+         */
+        route: '',
+
+        /**
+         * The complete route, including routes that this is contained by.
+         *
+         * @attribute fullRoute
+         * @type String
+         */
+        fullRoute: '',
+
+        /**
+         * The exposed parameters that were read from the URL.
+         *
+         * @attribute params
+         * @type Object
+         */
+        params: {},
+
+        /**
+         * Whether the route matches the current URL.
+         *
+         * @attributes active
+         * @type Boolean
+         */
+        active: false,
+
+        /**
+         * Whether the route's content is currently visible.
+         *
+         * If `autoVisibility` is enabled, this is bound to `active`.
+         *
+         * @attributes visible
+         * @type Boolean
+         */
+        visible: false,
+
+        /**
+         * Whether route content should be made visible when the route becomes
+         * active.
+         *
+         * @attributes autoVisibility
+         * @type Boolean
+         */
+        autoVisibility: true,
+      },
+
+      observe: {
+        'route': '_compile',
+      },
+
+      ready: function() {
+        this.model = this;
+        this._doEvaluate = this._evaluate.bind(this);
+      },
+
+      detached: function() {
+        this._unregister();
+      },
+
+      autoVisibilityChanged: function() {
+        if (this.autoVisibility) {
+          this.visible = this.active;
+        }
+      },
+
+      // TODO(nevir): intro/outro transitions defined by the route?
+      visibleChanged: function() {
+        if (this.visible) {
+          // We need to sandbox any current or future nodes inserted by the
+          // template, while leaving them in the light DOM. So, wrap 'em:
+          this._liveContent = document.createElement('div');
+          this._liveContent._containerForMoreRoute = this;
+          this._liveContent.appendChild(this.createInstance(this));
+          this.parentNode.insertBefore(this._liveContent, this.nextSibling);
+        } else {
+          this._liveContent.remove();
+        }
+      },
+
+      _compile: function() {
+        var routes = this._routeAncestry().map(function(a) {return a.route});
+        this.fullRoute = routes.join('/').replace(/\/+/g, '/');
+
+        this._routeParts  = [];
+        this._routeParams = {};
+        var rawParts = MoreRouting.adaptor.splitPath(this.fullRoute);
+        for (var i = 0, part; part = rawParts[i]; i++) {
+          if (part.substr(0, 1) === ':') {
+            this._routeParts[i]  = true;
+            this._routeParams[i] = part.substr(1);
+          } else if (part.substr(0, 1) === '*') {
+            this._routeParts[i] = true;
+          } else {
+            this._routeParts[i] = part;
+          }
+        }
+
+        this._register();
+      },
+
+      _register: function() {
+        this._unregister();
+        MoreRouting.adaptor.register(this._routeParts, this._doEvaluate);
+      },
+
+      _unregister: function() {
+        if (this._routeConfig) {
+          MoreRouting.adaptor.unregister(this._routeParts, this._doEvaluate);
+        }
+      },
+
+      // TODO(nevir): Observe the ancestry for changes.
+      _routeAncestry: function() {
+        var ancestry = [];
+        var node = this;
+        while (node) {
+          // TODO(nevir): Is this safe x-plat/polyfill?
+          if (node instanceof this.constructor) {
+            ancestry.unshift(node);
+          }
+
+          if (node._containerForMoreRoute) {
+            node = node._containerForMoreRoute;
+          } else {
+            node = node.parentNode;
+          }
+        }
+
+        return ancestry;
+      },
+
+      _evaluate: function(pathParts) {
+        this.active = !!pathParts;
+        if (this.autoVisibility) {
+          this.visible = this.active;
+        }
+
+        this.params = {};
+        if (!pathParts) return;
+
+        for (var i = 0; i < pathParts.length; i++) {
+          var param = this._routeParams[i];
+          if (param) {
+            this.params[param] = pathParts[i];
+          }
+        }
+      }
+    });
+  </script>
+</polymer-element>

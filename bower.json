@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "more-routing",
+  "dependencies": {
+    "polymer": "polymer/polymer#master"
+  },
+  "devDependencies": {
+    "core-scaffold": "polymer/core-scaffold#master"
+  }
+}
