@@ -1,0 +1,7 @@
+{
+  "name": "more-routing#gh-pages",
+  "private": true,
+  "dependencies": {
+    "more-routing": "polymore/more-routing#master"
+  }
+}

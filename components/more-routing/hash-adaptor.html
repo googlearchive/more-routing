@@ -1,0 +1,126 @@
+<script>
+(function() {
+var WILDCARD_KEY = '/*';
+var HANDLERS_KEY = '/handlers';
+
+// exposed as `MoreRouting.HashAdaptor`.
+//
+// Most of this logic should probably move a layer up once we support more than
+// just hash routes.
+function HashAdaptor() {
+  this._bindEvents();
+
+  this.currentPathParts = [];
+
+  this._root   = {};
+  this._active = [];
+
+  this._read();
+}
+
+// Registers a callback to be called whenever a URL matching `compiled` changes.
+// If the route no longer matches, `handler` will be called once with no
+// arguments.
+HashAdaptor.prototype.register = function register(compiled, handler) {
+  var node = this._root;
+  for (var i = 0, config; config = compiled[i]; i++) {
+    var key = config.match === true ? WILDCARD_KEY : config.match;
+    if (!(key in node)) node[key] = {};
+    node = node[key];
+  }
+
+  if (!(HANDLERS_KEY in node)) {
+    node[HANDLERS_KEY] = [];
+  }
+  node[HANDLERS_KEY].push(handler);
+
+  if (this.matches(compiled, this.currentPathParts)) {
+    handler(this.currentPathParts);
+    this._active.push(handler);
+  }
+};
+
+// Unregistered a callback that was `register`ed with the same arguments.
+HashAdaptor.prototype.unregister = function unregister(compiled, handler) {
+  var node = this._root;
+  for (var i = 0, config; config = compiled[i]; i++) {
+    var key = config.match === true ? WILDCARD_KEY : config.match;
+    if (!(key in node)) return;
+    node = node[key];
+  }
+  if (!node) return;
+
+  var index = node[HANDLERS_KEY].indexOf(handler);
+  if (index === -1) return;
+  node[HANDLERS_KEY].splice(index, 1);
+};
+
+// Whether `compiled` matches the current path parts.
+HashAdaptor.prototype.matches = function matches(compiled, params) {
+  if (params.length < compiled.length) return false;
+
+  for (var i = 0, config; config = compiled[i]; i++) {
+    if (config.match !== true && config.match !== params[i]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+HashAdaptor.prototype.navigateTo = function navigateTo(pathOrParts) {
+  var path = Array.isArray(pathOrParts) ? pathOrParts.join('/') : pathOrParts;
+  history.pushState({}, '', '#' + path);
+  // TODO(nevir): Why doesn't the pushState fire a hashchange event?
+  this._read();
+};
+
+// Private
+
+HashAdaptor.prototype._bindEvents = function _bindEvents() {
+  // TODO(nevir): Support unbinding?
+  window.addEventListener('hashchange', this._read.bind(this));
+};
+
+HashAdaptor.prototype._read = function _read() {
+  this.currentPathParts = MoreRouting.splitPath(window.location.hash.substr(1));
+  var handlers = this._matchingHandlers(this.currentPathParts);
+
+  // Always update active handlers.
+  for (var i = 0, handler; handler = handlers[i]; i++) {
+    handler(this.currentPathParts);
+  }
+
+  // active -> inactive.
+  for (var i = 0, handler; handler = this._active[i]; i++) {
+    if (handlers.indexOf(handler) === -1) {
+      handler();
+    }
+  }
+
+  this._active = handlers;
+};
+
+HashAdaptor.prototype._matchingHandlers = function _matchingHandlers(pathParts, node) {
+  if (!node) node = this._root;
+  var handlers = [];
+
+  if (HANDLERS_KEY in node) {
+    handlers = handlers.concat(node[HANDLERS_KEY]);
+  }
+  if (pathParts.length > 0) {
+    if (pathParts[0] in node) {
+      handlers = handlers.concat(this._matchingHandlers(pathParts.slice(1), node[pathParts[0]]));
+    }
+    if (WILDCARD_KEY in node) {
+      handlers = handlers.concat(this._matchingHandlers(pathParts.slice(1), node[WILDCARD_KEY]));
+    }
+  }
+
+  return handlers;
+}
+
+window.MoreRouting = window.MoreRouting || {};
+window.MoreRouting.HashAdaptor = HashAdaptor;
+})();
+</script>
