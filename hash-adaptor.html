@@ -17,18 +17,14 @@ function HashAdaptor() {
   this._read();
 }
 
-// Registers a callback to be called whenever `route` changes. If the route no
-// longer matches, `handler` will be called with no arguments.
-//
-// A route is simply an array of strings (exact path parts to match), or the
-// boolean `true` (a wildcard part).
-HashAdaptor.prototype.register = function register(route, handler) {
+// Registers a callback to be called whenever a URL matching `compiled` changes.
+// If the route no longer matches, `handler` will be called once with no
+// arguments.
+HashAdaptor.prototype.register = function register(compiled, handler) {
   var node = this._root;
-  for (var i = 0, matcher; matcher = route[i]; i++) {
-    var key = matcher === true ? WILDCARD_KEY : matcher;
-    if (!(key in node)) {
-      node[key] = {};
-    }
+  for (var i = 0, config; config = compiled[i]; i++) {
+    var key = config.match === true ? WILDCARD_KEY : config.match;
+    if (!(key in node)) node[key] = {};
     node = node[key];
   }
 
@@ -37,16 +33,17 @@ HashAdaptor.prototype.register = function register(route, handler) {
   }
   node[HANDLERS_KEY].push(handler);
 
-  if (this.matches(route, this._path)) {
+  if (this.matches(compiled, this._path)) {
     handler(this._path);
     this._active.push(handler);
   }
 };
 
-HashAdaptor.prototype.unregister = function unregister(route, handler) {
+// Unregistered a callback that was `register`ed with the same arguments.
+HashAdaptor.prototype.unregister = function unregister(compiled, handler) {
   var node = this._root;
-  for (var i = 0, matcher; matcher = route[i]; i++) {
-    var key = matcher === true ? WILDCARD_KEY : matcher;
+  for (var i = 0, config; config = compiled[i]; i++) {
+    var key = config.match === true ? WILDCARD_KEY : config.match;
     if (!(key in node)) return;
     node = node[key];
   }
@@ -57,29 +54,17 @@ HashAdaptor.prototype.unregister = function unregister(route, handler) {
   node[HANDLERS_KEY].splice(index, 1);
 };
 
-// Whether `route` matches the current path parts.
-HashAdaptor.prototype.matches = function matches(route, params) {
-  if (params.length < route.length) return false;
+// Whether `compiled` matches the current path parts.
+HashAdaptor.prototype.matches = function matches(compiled, params) {
+  if (params.length < compiled.length) return false;
 
-  for (var i = 0, matcher; matcher = route[i]; i++) {
-    if (matcher !== true && matcher !== params[i]) {
+  for (var i = 0, config; config = compiled[i]; i++) {
+    if (config.match !== true && config.match !== params[i]) {
       return false;
     }
   }
 
   return true;
-};
-
-// Utility
-
-// TODO(nevir): This doesn't seem like the right place.
-HashAdaptor.prototype.splitPath = function splitPath(path) {
-  var pathParts = path.split('/');
-  // Ignore leading and trailing slashes.
-  if (pathParts[0] === '') pathParts.shift();
-  if (pathParts[pathParts.length - 1] === '') pathParts.pop();
-
-  return pathParts;
 };
 
 // Private
@@ -90,7 +75,7 @@ HashAdaptor.prototype._bindEvents = function _bindEvents() {
 };
 
 HashAdaptor.prototype._read = function _read() {
-  this._path = this.splitPath(window.location.hash.substr(1));
+  this._path = MoreRouting.splitPath(window.location.hash.substr(1));
   var handlers = this._matchingHandlers(this._path);
 
   // Always update active handlers.
@@ -129,8 +114,5 @@ HashAdaptor.prototype._matchingHandlers = function _matchingHandlers(pathParts, 
 
 window.MoreRouting = window.MoreRouting || {};
 window.MoreRouting.HashAdaptor = HashAdaptor;
-
-// TODO(nevir): Support more than just a hash adaptor.
-window.MoreRouting.adaptor = new HashAdaptor();
 })();
 </script>

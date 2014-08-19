@@ -1,68 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<link rel="import" href="hash-adaptor.html">
+<link rel="import" href="more-routing.html">
 
-<!--
-`more-route` provides token based routing.
-
-Currently, it only supports hash based routing. The hope is that it can be
-expanded into path based routing in the future (by declaring mount points).
-
-
-## Binding to Params
-
-    <template is="more-route" route="forums/:forumId/:postId" params="{{params}}"></template>
-
-This example would make `params.forumId` and `params.postId` available.
-
-
-## Routes as Conditionals
-
-    <template is="more-route" route="users/:userId" name="user">
-      The current user is {{params.userId}}.
-    </template>
-
-`more-route` can also be treated as a conditional template, where its contents
-are evaluated when the route applies, and removed from the DOM otherwise.
-
-
-## Named Routes
-
-Furthermore, routes with just a `name` will proxy their values to the named
-`more-route` that also declares a `route`:
-
-    <template is="more-route" name="user"></template>
-
-
-## Route Expressions
-
-Route expressions are a series of tokens separated by `/` characters. A leading
-or trailing `/` characters is ignored. Tokens can be:
-
-`:parameters`: Any token beginning with `:` declares a named parameter for
-path parts at that segment of the URL.
-
-`*wildcards`: Any token beginning with `*` is treated as a wildcard. The name is
-not required, but allowed for documentation.
-
-`strings`: Any other token is treated as a static segment of the URL, and must
-exactly match.
-
-
-## Matching Behavior
-
-Routes will match any URL where they fully satisfy the URL, or a prefix of the
-URL. I.e. `users/:userId` matches `users/1` as well as `users/1/details`.
-Simimarly, the empty route `/` matches _all_ URLs.
--->
-<!--
-TODO(nevir): Figure out why we can't use <more-route> for simple route elements
-instead of <template is="more-route">.
--->
-<polymer-element name="more-route" extends="template">
+<polymer-element name="more-route">
   <script>
   (function() {
-    var namedRoutes = {};
+    // The set of properties that are bound by proxied routes.
+    var PROXIED_PROPERTIES = ['route', 'fullRoute', 'params', 'active'];
 
     Polymer('more-route', {
       publish: {
@@ -75,10 +19,12 @@ instead of <template is="more-route">.
         route: '',
 
         /**
-         * A unique name for this route.
+         * A unique name for this route, or the name of a route to proxy (if no
+         * `route` expression is given).
          *
-         * If `route` is not present, this element inherits routing information
-         * from the `more-route` that defines it for `name`.
+         * NOTE: Named routes are only evaluated when the element is created!
+         * Call `MoreRouting.registerNamedRoute` if you need to do something
+         * more dynamic.
          *
          * @attribute name
          * @type String
@@ -110,25 +56,6 @@ instead of <template is="more-route">.
         active: false,
 
         /**
-         * Whether the route's content is currently visible.
-         *
-         * If `autoVisibility` is enabled, this is bound to `active`.
-         *
-         * @attribute visible
-         * @type Boolean
-         */
-        visible: false,
-
-        /**
-         * Whether route content should be made visible when the route becomes
-         * active.
-         *
-         * @attribute autoVisibility
-         * @type Boolean
-         */
-        autoVisibility: true,
-
-        /**
          * Whether this route is a proxy to the primary route with the same
          * `name`.
          *
@@ -140,135 +67,101 @@ instead of <template is="more-route">.
         proxy: false,
       },
 
-      observe: {
-        'route': '_compile',
-      },
+      // Lifecycle
 
       ready: function() {
-        this.proxy = this.name && !this.route;
-        this.model = this;
         this._doEvaluate = this._evaluate.bind(this);
-      },
-
-      detached: function() {
-        this._unregister();
-      },
-
-      nameChanged: function(prevName, name) {
-        if (this.route && !this.proxy) {
-          if (namedRoutes[name]) {
-            throw new Error('Named route "' + name + '" is already defined!');
-          }
-          namedRoutes[name] = this;
-          return;
-        }
-
-        this.bind('route',     new PathObserver(namedRoutes[name], 'route'));
-        this.bind('fullRoute', new PathObserver(namedRoutes[name], 'fullRoute'));
-        this.bind('params',    new PathObserver(namedRoutes[name], 'params'));
-        this.bind('active',    new PathObserver(namedRoutes[name], 'active'));
-      },
-
-      autoVisibilityChanged: function() {
-        if (this.autoVisibility) {
-          this.visible = this.active;
+        if (this.name && this.route) {
+          MoreRouting.registerNamedRoute(this);
         }
       },
 
-      activeChanged: function() {
-        if (this.autoVisibility) {
-          this.visible = this.active;
-        }
+      // Observers
+
+      nameChanged: function() {
+        this._identityChanged();
       },
 
-      // TODO(nevir): intro/outro transitions defined by the route?
-      visibleChanged: function() {
-        if (this.visible) {
-          if (!this.content) return;
-          // We need to sandbox any current or future nodes inserted by the
-          // template, while leaving them in the light DOM. So, wrap 'em:
-          this._liveContent = document.createElement('div');
-          this._liveContent._containerForMoreRoute = this;
-          this._liveContent.appendChild(this.createInstance(this));
-          this.parentNode.insertBefore(this._liveContent, this.nextSibling);
+      routeChanged: function() {
+        if (this.proxy) return;
+        this._identityChanged();
+
+        if (this.route) {
+          var routes = this._routeAncestry().map(function(a) {return a.route});
+          this.fullRoute = routes.join('/').replace(/\/+/g, '/');
+          this._compiled = MoreRouting.compileExpression(this.fullRoute);
+          MoreRouting.adaptor.register(this._compiled, this._doEvaluate);
         } else {
-          if (this._liveContent) {
-            this._liveContent.remove();
-          }
+          MoreRouting.adaptor.unregister(this._compiled, this._doEvaluate);
+          this._compiled = null;
         }
       },
 
-      _compile: function() {
-        if (this.proxy) return;
-        var routes = this._routeAncestry().map(function(a) {return a.route});
-        this.fullRoute = routes.join('/').replace(/\/+/g, '/');
-
-        this._routeParts  = [];
-        this._routeParams = {};
-        var rawParts = MoreRouting.adaptor.splitPath(this.fullRoute);
-        for (var i = 0, part; part = rawParts[i]; i++) {
-          if (part.substr(0, 1) === ':') {
-            this._routeParts[i]  = true;
-            this._routeParams[i] = part.substr(1);
-          } else if (part.substr(0, 1) === '*') {
-            this._routeParts[i] = true;
-          } else {
-            this._routeParts[i] = part;
-          }
-        }
-
-        this._register();
-      },
-
-      _register: function() {
-        if (this.proxy) return;
-        this._unregister();
-        MoreRouting.adaptor.register(this._routeParts, this._doEvaluate);
-      },
-
-      _unregister: function() {
-        if (this.proxy) return;
-        if (this._routeConfig) {
-          MoreRouting.adaptor.unregister(this._routeParts, this._doEvaluate);
-        }
-      },
-
-      // TODO(nevir): Observe the ancestry for changes.
-      _routeAncestry: function() {
-        var ancestry = [];
-        var node = this;
-        while (node) {
-          // TODO(nevir): Is this safe x-plat/polyfill?
-          if (node instanceof this.constructor) {
-            ancestry.unshift(node);
-          }
-
-          if (node._containerForMoreRoute) {
-            node = node._containerForMoreRoute;
-          } else {
-            node = node.parentNode;
-          }
-        }
-
-        return ancestry;
-      },
+      // Adaptor Workflow
 
       _evaluate: function(pathParts) {
         if (this.proxy) {
-          throw new Error('Bug! Proxy route got route update callback!');
+          throw new Error('Bug! Proxy route got route update callback');
         }
 
         this.active = !!pathParts;
         this.params = {};
         if (!pathParts) return;
 
-        for (var i = 0; i < pathParts.length; i++) {
-          var param = this._routeParams[i];
-          if (param) {
-            this.params[param] = pathParts[i];
+        for (var i = 0, config; config = this._compiled[i]; i++) {
+          if (config.param) {
+            this.params[config.param] = pathParts[i];
           }
         }
-      }
+      },
+
+      // Named Route Proxying
+
+      _identityChanged: function() {
+        if (!this.name && MoreRouting.namedRoutes[this.name] === this) {
+          MoreRouting.unregisterNamedRoute(this);
+        }
+
+        this.proxy = this.name && !this.route;
+        this.proxy ? this._bindToNamedRoute() : this._unbindFromNamedRoute();
+      },
+
+      _bindToNamedRoute: function() {
+        var namedRoute = MoreRouting.namedRoutes[this.name];
+        if (!namedRoute) {
+          throw new Error('No route named "' + this.name + '" has been declared');
+        }
+
+        this._namedRouteBindings = PROXIED_PROPERTIES.map(function(property) {
+          this.bind(property, new PathObserver(namedRoute, property));
+        }.bind(this));
+      },
+
+      _unbindFromNamedRoute: function() {
+        if (!this._namedRouteBindings) return;
+        for (var i = 0, binding; binding = this._namedRouteBindings[i]; i++) {
+          binding.close();
+        }
+      },
+
+      // Nesting
+
+      // Includes this.
+      _routeAncestry: function() {
+        var ancestry = [];
+        var node = this;
+        while (node) {
+          var route = node.containsRoute || node;
+          // TODO(nevir): Is this safe x-plat/polyfill?
+          if (route instanceof this.constructor) {
+            ancestry.unshift(route);
+          }
+
+          node = node.parentNode;
+        }
+
+        return ancestry;
+      },
     });
   })();
   </script>

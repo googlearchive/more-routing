@@ -1,27 +1,27 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-`more-router` manages routes that are exclusive of one another.
+`more-route-switch` manages routes that are exclusive of one another.
 
 The first active route (route that matches the URL) will be visible in the DOM.
 
 ## Example:
 
-    <more-router>
-      <template id="more-route" route="users/:userId">
+    <more-route-switch>
+      <template is="more-route-if" route="/users/:userId">
         You're looking at user {{params.userId}}.
       </template>
-      <template id="more-route" route="">
+      <template is="more-route-if" route="/">
         This is the index!
       </template>
-    </more-router>
+    </more-route-switch>
 
 If the URL is 'users/foo', "You're looking at user foo." would be visible. Any
 other URL would display "This is the index!".
 -->
-<polymer-element name="more-router">
+<polymer-element name="more-route-switch">
   <script>
-    Polymer('more-router', {
+    Polymer('more-route-switch', {
       ready: function() {
         this._routes = [];
         // TODO(nevir): Handle dynamically added routes.

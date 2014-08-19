@@ -1,0 +1,51 @@
+<link rel="import" href="hash-adaptor.html">
+
+<script>
+MoreRouting = window.MoreRouting || {};
+
+// Named Routes
+
+// All named routes.
+MoreRouting.namedRoutes = {};
+
+MoreRouting.registerNamedRoute = function registerNamedRoute(route) {
+  if (!route.name) {
+    throw new Error('Named routes ...require a name.');
+  }
+  if (route.name in this.namedRoutes) {
+    throw new Error('The named route "' + route.name + '" is already declared');
+  }
+  this.namedRoutes[route.name] = route;
+};
+
+MoreRouting.unregisterNamedRoute = function unregisterNamedRoute(route) {
+  throw new Error('Unregistering named routes is not supported');
+};
+
+// Parsing & Utility
+
+MoreRouting.compileExpression = function compileExpression(routeExpression) {
+  return this.splitPath(routeExpression).map(function(part) {
+    var sentinel = part.substr(0, 1);
+    if (sentinel === ':') {
+      return {param: part.substr(1), match: true};
+    } else if (sentinel === '*') {
+      return {match: true};
+    } else {
+      return {match: part};
+    }
+  });
+};
+
+MoreRouting.splitPath = function splitPath(path) {
+  var pathParts = path.split('/');
+  // Ignore leading and trailing slashes.
+  if (pathParts[0] === '') pathParts.shift();
+  if (pathParts[pathParts.length - 1] === '') pathParts.pop();
+
+  return pathParts;
+};
+
+// TODO(nevir): Support more than just hash routing. MUST BE LAST.
+MoreRouting.adaptor = new MoreRouting.HashAdaptor();
+</script>
