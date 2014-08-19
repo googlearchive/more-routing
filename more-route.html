@@ -118,20 +118,12 @@
       // Named Route Proxying
 
       _identityChanged: function() {
-        if (!this.name && MoreRouting.namedRoutes[this.name] === this) {
-          MoreRouting.unregisterNamedRoute(this);
-        }
-
         this.proxy = this.name && !this.route;
         this.proxy ? this._bindToNamedRoute() : this._unbindFromNamedRoute();
       },
 
       _bindToNamedRoute: function() {
-        var namedRoute = MoreRouting.namedRoutes[this.name];
-        if (!namedRoute) {
-          throw new Error('No route named "' + this.name + '" has been declared');
-        }
-
+        var namedRoute = MoreRouting.getNamedRoute(this.name);
         this._namedRouteBindings = PROXIED_PROPERTIES.map(function(property) {
           this.bind(property, new PathObserver(namedRoute, property));
         }.bind(this));
@@ -157,7 +149,7 @@
             ancestry.unshift(route);
           }
 
-          node = node.parentNode;
+          node = node.parentNode || node.host;
         }
 
         return ancestry;

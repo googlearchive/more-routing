@@ -18,8 +18,12 @@ MoreRouting.registerNamedRoute = function registerNamedRoute(route) {
   this.namedRoutes[route.name] = route;
 };
 
-MoreRouting.unregisterNamedRoute = function unregisterNamedRoute(route) {
-  throw new Error('Unregistering named routes is not supported');
+MoreRouting.getNamedRoute = function getNamedRoute(name) {
+  var route = this.namedRoutes[name];
+  if (!route) {
+    throw new Error('No route named "' + name + '" has been declared');
+  }
+  return route;
 };
 
 // Parsing & Utility
