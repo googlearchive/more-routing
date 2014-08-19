@@ -125,6 +125,7 @@ Simimarly, the empty route `/` matches _all_ URLs.
       // TODO(nevir): intro/outro transitions defined by the route?
       visibleChanged: function() {
         if (this.visible) {
+          if (!this.content) return;
           // We need to sandbox any current or future nodes inserted by the
           // template, while leaving them in the light DOM. So, wrap 'em:
           this._liveContent = document.createElement('div');
@@ -132,7 +133,9 @@ Simimarly, the empty route `/` matches _all_ URLs.
           this._liveContent.appendChild(this.createInstance(this));
           this.parentNode.insertBefore(this._liveContent, this.nextSibling);
         } else {
-          this._liveContent.remove();
+          if (this._liveContent) {
+            this._liveContent.remove();
+          }
         }
       },
 
