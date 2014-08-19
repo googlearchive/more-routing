@@ -115,11 +115,13 @@ HashAdaptor.prototype._matchingHandlers = function _matchingHandlers(pathParts, 
   if (HANDLERS_KEY in node) {
     handlers = handlers.concat(node[HANDLERS_KEY]);
   }
-  if (pathParts[0] in node) {
-    handlers = handlers.concat(this._matchingHandlers(pathParts.slice(1), node[pathParts[0]]));
-  }
-  if (WILDCARD_KEY in node) {
-    handlers = handlers.concat(this._matchingHandlers(pathParts.slice(1), node[WILDCARD_KEY]));
+  if (pathParts.length > 0) {
+    if (pathParts[0] in node) {
+      handlers = handlers.concat(this._matchingHandlers(pathParts.slice(1), node[pathParts[0]]));
+    }
+    if (WILDCARD_KEY in node) {
+      handlers = handlers.concat(this._matchingHandlers(pathParts.slice(1), node[WILDCARD_KEY]));
+    }
   }
 
   return handlers;
