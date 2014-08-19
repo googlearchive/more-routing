@@ -10,8 +10,9 @@ var HANDLERS_KEY = '/handlers';
 function HashAdaptor() {
   this._bindEvents();
 
+  this.currentPathParts = [];
+
   this._root   = {};
-  this._path   = [];
   this._active = [];
 
   this._read();
@@ -33,8 +34,8 @@ HashAdaptor.prototype.register = function register(compiled, handler) {
   }
   node[HANDLERS_KEY].push(handler);
 
-  if (this.matches(compiled, this._path)) {
-    handler(this._path);
+  if (this.matches(compiled, this.currentPathParts)) {
+    handler(this.currentPathParts);
     this._active.push(handler);
   }
 };
@@ -67,7 +68,8 @@ HashAdaptor.prototype.matches = function matches(compiled, params) {
   return true;
 };
 
-HashAdaptor.prototype.navigateTo = function navigateTo(path) {
+HashAdaptor.prototype.navigateTo = function navigateTo(pathOrParts) {
+  var path = Array.isArray(pathOrParts) ? pathOrParts.join('/') : pathOrParts;
   history.pushState({}, '', '#' + path);
   // TODO(nevir): Why doesn't the pushState fire a hashchange event?
   this._read();
@@ -81,12 +83,12 @@ HashAdaptor.prototype._bindEvents = function _bindEvents() {
 };
 
 HashAdaptor.prototype._read = function _read() {
-  this._path = MoreRouting.splitPath(window.location.hash.substr(1));
-  var handlers = this._matchingHandlers(this._path);
+  this.currentPathParts = MoreRouting.splitPath(window.location.hash.substr(1));
+  var handlers = this._matchingHandlers(this.currentPathParts);
 
   // Always update active handlers.
   for (var i = 0, handler; handler = handlers[i]; i++) {
-    handler(this._path);
+    handler(this.currentPathParts);
   }
 
   // active -> inactive.

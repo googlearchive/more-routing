@@ -27,7 +27,11 @@ MoreRouting.getNamedRoute = function getNamedRoute(name) {
 };
 
 MoreRouting.navigateTo = function navigateTo(name, params) {
-  this.getNamedRoute(name).navigateTo(params);
+  return this.getNamedRoute(name).navigateTo(params);
+};
+
+MoreRouting.isCurrentUrl = function isCurrentUrl(name, params) {
+  return this.getNamedRoute(name).isCurrentUrl(params);
 };
 
 // Parsing & Utility
