@@ -98,7 +98,7 @@
         var compiled = this._compiledRoute();
         var current  = MoreRouting.adaptor.currentPathParts;
         // Prefixes are ok.
-        if (compiled.length < current.length) return false;
+        if (compiled.length > current.length) return false;
 
         for (var i = 0, config; config = compiled[i]; i++) {
           if (config.match !== true && config.match !== current[i]) {
