@@ -73,6 +73,15 @@ purposes.
         active: false,
 
         /**
+         * The value that the route's params are exposed as within the template.
+         *
+         * @attribute paramsKey
+         * @default 'params'
+         * @type String
+         */
+        paramsKey: 'params',
+
+        /**
          * Whether the route's content is currently visible.
          *
          * If `autoVisibility` is enabled, this is bound to `active`.
@@ -117,7 +126,14 @@ purposes.
           this._liveContent = document.createElement('div');
           this._liveContent.containsRoute = this.$.route;
           this._liveContent.setAttribute('content-for-more-route-if', '');
-          this._liveContent.appendChild(this.createInstance(this.$.route));
+
+          // If we are nested within another template, we inherit its model.
+          var model = Object.create(this.templateInstance && this.templateInstance.model || null);
+          // TODO(nevir): Bind it.
+          model[this.paramsKey] = this.$.route.params;
+
+          // var syntax = this.syntax || (!template.bindingDelegate && this.element.syntax);
+          this._liveContent.appendChild(this.createInstance(model, this.bindingDelegate));
           this.parentNode.insertBefore(this._liveContent, this.nextSibling);
         } else {
           if (this._liveContent) {
