@@ -2,10 +2,12 @@
   "private": true,
   "name": "more-routing",
   "dependencies": {
-    "polymer": "polymer/polymer#master"
+    "core-item": "Polymer/core-item#master",
+    "template-switch": "Polymore/template-switch#master",
+    "polymer": "Polymer/polymer#master"
   },
   "devDependencies": {
-    "core-component-page": "polymer/core-component-page#master",
-    "core-scaffold": "polymer/core-scaffold#master"
+    "core-scaffold": "Polymer/core-scaffold#master",
+    "more-param": "Polymore/more-param#master"
   }
 }
