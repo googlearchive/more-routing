@@ -9,58 +9,69 @@
 
   <script src="../platform/platform.js"></script>
   <link rel="import" href="../core-scaffold/core-scaffold.html">
+  <link rel="import" href="../more-param/more-param.html">
 
-  <link rel="import" href="more-route.html">
-  <link rel="import" href="more-route-if.html">
+  <link rel="import" href="more-route-item.html">
   <link rel="import" href="more-route-switch.html">
+  <link rel="import" href="more-route.html">
+  <link rel="import" href="more-routing.html">
 
   <style>
-    core-scaffold nav a {
+    more-route-item {
       display: block;
       padding: 0.5em;
+    }
+    more-route-item[current] {
+      background: #9C5299;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <more-route route="/users/:userId" name="user"></more-route>
-  <more-route route="/articles/:articleId" name="article"></more-route>
-  <more-route name="article"></more-route>
+  <template is="auto-binding">
+    <more-param key="driver" value="{{driver}}" default="hash"></more-param>
 
-  <core-scaffold>
+    <more-routing driver="{{driver}}"></more-routing>
+    <more-route name="user" path="/users/:userId">
+      <more-route name="user-bio" path="/bio"></more-route>
+    </more-route>
 
-    <header tool>more-routing</header>
+    <core-scaffold>
 
-    <nav>
-      <a href="#">/</a>
-      <a href="#users/foo">/users/foo</a>
-      <a href="#users/foo/settings">/users/foo/settings</a>
-      <a href="#users/bar">/users/bar</a>
-      <a href="#users/bar/settings">/users/bar/settings</a>
-      <a href="#articles/1">/articles/1</a>
-      <a href="#articles/1/love-the-platform">/articles/1/love-the-platform</a>
-      <a href="#articles/2">/articles/2</a>
-    </nav>
+      <header tool>more-routing</header>
 
-    <more-route-switch>
-      <template is="more-route-if" name="user">
-        <p>User: {{params.userId}}</p>
-        <template is="more-route-if" route="/settings">
-          <p>Settings and stuff for user: {{params.userId}}.</p>
-        </template>
-      </template>
+      <nav>
+        <more-route-item path="/">Index</more-route-item>
+        <more-route-item path="/about">About</more-route-item>
+        <more-route-item name="user"     params="{{ {userId: 1} }}">User 1</more-route-item>
+        <more-route-item name="user-bio" params="{{ {userId: 1} }}">User 1's bio</more-route-item>
+        <more-route-item name="user"     params="{{ {userId: 2} }}">User 2</more-route-item>
+        <more-route-item name="user-bio" params="{{ {userId: 2} }}">User 2's bio</more-route-item>
+      </nav>
 
-      <template is="more-route-if" name="article">
-        <p>You're reading article #{{params.articleId}}.</p>
+      <section id="content">
+        <more-route-switch>
 
-        <more-route route="/:slug" params="{{inner}}"></more-route>
-        <p>slug: {{inner.slug}}.</p>
-      </template>
+          <template when-route="user">
+            <header>User {{params.userId}}</header>
+            <template if="{{ route('user-bio').active }}">
+              All the details about {{params.userId}} that you didn't want to know...
+            </template>
+          </template>
 
-      <template is="more-route-if" route="/">
-        <p>Ohai. Click around! There are some helpful links to the left.</p>
-      </template>
-    </more-route-switch>
+          <template when-route="/about">
+            It's a routing demo!
+            <a href="{{ urlFor('user-bio', {userId: 1}) }}">Read about user 1</a>.
+          </template>
 
-  </core-scaffold>
+          <template else>
+            The index.
+          </template>
+
+        </more-route-switch>
+      </section>
+    </core-scaffold>
+
+  </template>
 </body>
 </html>

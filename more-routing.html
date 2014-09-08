@@ -1,63 +1,53 @@
-<link rel="import" href="hash-adaptor.html">
+<link rel="import" href="../polymer/polymer.html">
 
-<script>
-MoreRouting = window.MoreRouting || {};
+<link rel="import" href="routing.html">
+<link rel="import" href="hash-driver.html">
+<link rel="import" href="path-driver.html">
 
-// Named Routes
+<!--
+TODO(nevir): Document.
 
-// All named routes.
-MoreRouting.namedRoutes = {};
+-->
+<polymer-element name="more-routing">
+  <script>
+    Polymer('more-routing', {
+      publish: {
+        /**
+         * The routing driver to use.
+         *
+         *  * `hash`: `MoreRouting.HashDriver`
+         *  * `path`: `MoreRouting.PathDriver`
+         *
+         * @attribute driver
+         * @type String
+         */
+        driver: '',
 
-MoreRouting.registerNamedRoute = function registerNamedRoute(route) {
-  if (!route.name) {
-    throw new Error('Named routes ...require a name.');
-  }
-  if (route.name in this.namedRoutes) {
-    throw new Error('The named route "' + route.name + '" is already declared');
-  }
-  this.namedRoutes[route.name] = route;
-};
+        /**
+         *
+         */
+        urlPrefix: '',
+      },
 
-MoreRouting.getNamedRoute = function getNamedRoute(name) {
-  var route = this.namedRoutes[name];
-  if (!route) {
-    throw new Error('No route named "' + name + '" has been declared');
-  }
-  return route;
-};
+      ready: function() {
+        var driver;
+        // TODO(nevir): Support custom drivers, too.
+        if (this.driver === 'hash') {
+          driver = new MoreRouting.HashDriver(this._config);
+        } else if (this.driver === 'path') {
+          driver = new MoreRouting.PathDriver(this._config);
+        } else {
+          throw new Error('Unknown driver type "' + this.driver + '"');
+        }
 
-MoreRouting.navigateTo = function navigateTo(name, params) {
-  return this.getNamedRoute(name).navigateTo(params);
-};
+        MoreRouting.driver = driver;
+      },
 
-MoreRouting.isCurrentUrl = function isCurrentUrl(name, params) {
-  return this.getNamedRoute(name).isCurrentUrl(params);
-};
-
-// Parsing & Utility
-
-MoreRouting.compileExpression = function compileExpression(routeExpression) {
-  return this.splitPath(routeExpression).map(function(part) {
-    var sentinel = part.substr(0, 1);
-    if (sentinel === ':') {
-      return {param: part.substr(1), match: true};
-    } else if (sentinel === '*') {
-      return {match: true};
-    } else {
-      return {match: part};
-    }
-  });
-};
-
-MoreRouting.splitPath = function splitPath(path) {
-  var pathParts = path.split('/');
-  // Ignore leading and trailing slashes.
-  if (pathParts[0] === '') pathParts.shift();
-  if (pathParts[pathParts.length - 1] === '') pathParts.pop();
-
-  return pathParts;
-};
-
-// TODO(nevir): Support more than just hash routing. MUST BE LAST.
-MoreRouting.adaptor = new MoreRouting.HashAdaptor();
-</script>
+      get _config() {
+        var config = {};
+        if (this.urlPrefix) config.prefix = this.urlPrefix;
+        return config;
+      },
+    });
+  </script>
+</polymer-element>

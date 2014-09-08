@@ -1,30 +1,23 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<link rel="import" href="more-routing.html">
+<link rel="import" href="routing.html">
 
+<!--
+TODO(nevir): Document.
+
+-->
 <polymer-element name="more-route">
   <script>
-  (function() {
-    // The set of properties that are bound by proxied routes.
-    var PROXIED_PROPERTIES = ['route', 'fullRoute', 'params', 'active'];
-
     Polymer('more-route', {
       publish: {
         /**
-         * A routing expression used to parse parameters from the window's URL.
+         * The name of this route. Behavior differs based on the presence of
+         * `path` during _declaration_.
          *
-         * @attribute route
-         * @type String
-         */
-        route: '',
-
-        /**
-         * A unique name for this route, or the name of a route to proxy (if no
-         * `route` expression is given).
+         * If `path` is present during declaration, it is registered via `name`.
          *
-         * NOTE: Named routes are only evaluated when the element is created!
-         * Call `MoreRouting.registerNamedRoute` if you need to do something
-         * more dynamic.
+         * Otherwise, this `more-route` becomes a `reference` to the route with
+         * `name`. Changing `name` will update which route is referenced.
          *
          * @attribute name
          * @type String
@@ -32,15 +25,34 @@
         name: '',
 
         /**
-         * The complete route, including routes that this is contained by.
+         * A path expression used to parse parameters from the window's URL.
          *
-         * @attribute fullRoute
+         * @attribute path
          * @type String
          */
-        fullRoute: '',
+        path: '',
 
         /**
-         * The exposed parameters that were read from the URL.
+         * The full path expression for this route, including routes this is
+         * nested within.
+         *
+         * @attribute fullPath
+         * @type String
+         * @readonly
+         */
+        fullPath: '',
+
+        /**
+         * Whether this route is a reference to a named route.
+         *
+         * @attribute reference
+         * @type Boolean
+         */
+        reference: false,
+
+        /**
+         * Param values matching the current URL, or an empty object if not
+         * `active`.
          *
          * @attribute params
          * @type Object
@@ -52,178 +64,112 @@
          *
          * @attribute active
          * @type Boolean
+         * @readonly
          */
         active: false,
 
         /**
-         * Whether this route is a proxy to the primary route with the same
-         * `name`.
+         * The underlying `MoreRouting.Route` object that is being wrapped.
          *
-         * Defaults to `true` when `name` is set, but `route` is not.
-         *
-         * @attribute proxy
-         * @type Boolean
+         * @attribute route
+         * @type MoreRouting.Route
+         * @readonly
          */
-        proxy: false,
+        route: null,
+
+        /**
+         * The parent `more-route` element, if it is nested within another.
+         *
+         * Parents are found by searching up this element's ancestry for nodes
+         * that are `more-route` elements, or have a `moreRouteContext`
+         * property.
+         *
+         * @attribute parent
+         * @type <more-route>
+         * @readonly
+         */
+        parent: null,
       },
 
-      /**
-       * Convert `params` into the URL they represent for this route.
-       *
-       * @method urlFor
-       * @param params Object
-       */
-      urlFor: function(params) {
-        return this._partsForParams(params).join('/');
+      observe: {
+        'name':      '_identityChanged',
+        'path':      '_identityChanged',
+        'reference': '_identityChanged',
+        // TODO(nevir): Truly read-only properties would be super handy.
+        'active':    '_updateProxiedValues',
       },
-
-      /**
-       * Navigates to the URL represented by `params`.
-       *
-       * @method navigateTo
-       * @param params Object
-       */
-      navigateTo: function(params) {
-        MoreRouting.adaptor.navigateTo(this.urlFor(params));
-      },
-
-      /**
-       * Whether `params` matches this route **and** the current URL.
-       *
-       * @method isCurrentUrl
-       * @param params Object
-       */
-      isCurrentUrl: function(params) {
-        if (!this.active) return;
-        var compiled = this._compiledRoute();
-        var current  = MoreRouting.adaptor.currentPathParts;
-        // Prefixes are ok.
-        if (compiled.length > current.length) return false;
-
-        for (var i = 0, config; config = compiled[i]; i++) {
-          if (config.match !== true && config.match !== current[i]) {
-            return false;
-          }
-          if (config.param && params[config.param] !== current[i]) {
-            return false;
-          }
-          // And ignore wildcards.
-        }
-
-        return true;
-      },
-
-      // Lifecycle
 
       ready: function() {
-        this._doEvaluate = this._evaluate.bind(this);
-        if (this.name && this.route) {
-          MoreRouting.registerNamedRoute(this);
-        }
+        this.reference = this.name && !this.path;
       },
 
-      // Observers
-
-      nameChanged: function() {
-        this._identityChanged();
+      attached: function() {
+        this.parent = this._findParent();
       },
 
-      routeChanged: function() {
-        if (this.proxy) return;
-        this._identityChanged();
-
-        if (this.route) {
-          var routes = this._routeAncestry().map(function(a) {return a.route});
-          this.fullRoute = routes.join('/').replace(/\/+/g, '/');
-          this._compiled = MoreRouting.compileExpression(this.fullRoute);
-          MoreRouting.adaptor.register(this._compiled, this._doEvaluate);
-        } else {
-          MoreRouting.adaptor.unregister(this._compiled, this._doEvaluate);
-          this._compiled = null;
-        }
+      urlFor: function(params) {
+        return this.route.urlFor(params);
       },
 
-      // Adaptor Workflow
-
-      _evaluate: function(pathParts) {
-        if (this.proxy) {
-          throw new Error('Bug! Proxy route got route update callback');
-        }
-
-        this.active = !!pathParts;
-        this.params = {};
-        if (!pathParts) return;
-
-        for (var i = 0, config; config = this._compiled[i]; i++) {
-          if (config.param) {
-            this.params[config.param] = pathParts[i];
-          }
-        }
+      navigateTo: function(params) {
+        return this.route.navigateTo(params);
       },
 
-      // Named Route Proxying
+      isCurrentUrl: function(params) {
+        return this.route.isCurrentUrl(params);
+      },
 
       _identityChanged: function() {
-        this.proxy = this.name && !this.route;
-        this.proxy ? this._bindToNamedRoute() : this._unbindFromNamedRoute();
-      },
+        var fullPath = (this.parent && this.parent.path || '') + this.path;
 
-      _bindToNamedRoute: function() {
-        var namedRoute = MoreRouting.getNamedRoute(this.name);
-        this._namedRouteBindings = PROXIED_PROPERTIES.map(function(property) {
-          this.bind(property, new PathObserver(namedRoute, property));
-        }.bind(this));
-      },
+        if (this.name && this.reference) {
+          this.route    = MoreRouting.getRouteByName(this.name);
+          this.path     = this.route.path;
+          this.fullPath = this.route.path;
+        } else if (this.path && this.name) {
+          this.route    = MoreRouting.registerNamedRoute(this.name, fullPath);
+          this.path     = this.path;
+          this.fullPath = fullPath;
+        } else if (this.path) {
+          this.route    = MoreRouting.getRouteByPath(fullPath);
+          this.path     = this.path;
+          this.fullPath = fullPath;
+        } else {
+          this.route    = null;
+          this.path     = '';
+          this.fullPath = '';
+        }
 
-      _unbindFromNamedRoute: function() {
-        if (!this._namedRouteBindings) return;
-        for (var i = 0, binding; binding = this._namedRouteBindings[i]; i++) {
-          binding.close();
+        if (this._routeObserver) this._routeObserver.close();
+        if (this.route) {
+          this.params = this.route.params;
+          this._observeRoute(this.route);
+        } else {
+          this.params = {};
         }
       },
 
-      // Utility
+      _updateProxiedValues: function() {
+        this.active  = this.route && this.route.active;
+      },
 
-      // Includes this.
-      _routeAncestry: function() {
-        var ancestry = [];
+      _observeRoute: function(route) {
+        this._routeObserver = new CompoundObserver();
+        this._routeObserver.addPath(route, 'active');
+        this._routeObserver.open(this._updateProxiedValues.bind(this));
+      },
+
+      _findParent: function() {
         var node = this;
         while (node) {
-          var route = node.containsRoute || node;
-          // TODO(nevir): Is this safe x-plat/polyfill?
-          if (route instanceof this.constructor) {
-            ancestry.unshift(route);
-          }
-
           node = node.parentNode || node.host;
-        }
-
-        return ancestry;
-      },
-
-      _compiledRoute: function() {
-        return this._compiled || MoreRouting.getNamedRoute(this.name)._compiled;
-      },
-
-      _partsForParams: function(params) {
-        var parts = this._compiledRoute().map(function(config) {
-          if (config.param) {
-            if (!params[config.param]) {
-              throw new Error('param "' + config.param + '" is required for route: ' + this.route);
-            }
-            return params[config.param];
-
-          // TODO(nevir): Wildcards aren't very well supported. Fix that.
-          } else if (config.match === true) {
-            return '';
-          } else {
-            return config.match;
+          var route = node && node.moreRouteContext || node;
+          if (route instanceof this.constructor && route !== this) {
+            return route;
           }
-        });
-
-        return parts;
+        }
+        return null;
       },
     });
-  })();
   </script>
 </polymer-element>
