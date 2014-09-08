@@ -3,7 +3,7 @@
   "name": "more-routing",
   "dependencies": {
     "core-item": "Polymer/core-item#master",
-    "template-switch": "Polymore/template-switch#master",
+    "more-switch": "Polymore/more-switch#master",
     "polymer": "Polymer/polymer#master"
   },
   "devDependencies": {
