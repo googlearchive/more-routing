@@ -5,7 +5,6 @@
 <script>
 (function(scope) {
 var PolymerExpressions = scope.PolymerExpressions;
-if (PolymerExpressions) {
 var MoreRouting = scope.MoreRouting = scope.MoreRouting || {};
 
 /**
@@ -31,7 +30,5 @@ PolymerExpressions.prototype.isCurrentUrl = {
     return [[MoreRouting.getRoute(pathOrName), 'parts']];
   },
 };
-
-} // if (PolymerExpressions)
 })(window);
 </script>
