@@ -6,7 +6,8 @@ MoreRouting.Driver = Driver;
 /**
  * TODO(nevir): Docs.
  */
-function Driver(config) {
+function Driver(opt_config) {
+  var config = opt_config || {};
   if (config.prefix) this.prefix = config.prefix;
 
   this._activeRoutes = [];
@@ -36,7 +37,7 @@ Driver.prototype.navigateToParts = function(parts) {
 };
 
 Driver.prototype.navigateToUrl = function navigateToUrl(url) {
-  throw new Error('navigateToUrl not implemented');
+  throw new Error(this.constructor.name + '#navigateToUrl not implemented');
 };
 
 // Subclass Interface

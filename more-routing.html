@@ -1,12 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <link rel="import" href="routing.html">
+<!-- TODO(nevir): import on demand? -->
 <link rel="import" href="driver/hash.html">
+<link rel="import" href="driver/mock.html">
 <link rel="import" href="driver/path.html">
 
 <!--
 TODO(nevir): Document.
-
 -->
 <polymer-element name="more-routing">
   <script>
@@ -17,6 +18,7 @@ TODO(nevir): Document.
          *
          *  * `hash`: `MoreRouting.HashDriver`
          *  * `path`: `MoreRouting.PathDriver`
+         *  * `mock`: `MoreRouting.MockDriver`
          *
          * @attribute driver
          * @type String
@@ -36,6 +38,8 @@ TODO(nevir): Document.
           driver = new MoreRouting.HashDriver(this._config);
         } else if (this.driver === 'path') {
           driver = new MoreRouting.PathDriver(this._config);
+        } else if (this.driver === 'mock') {
+          driver = new MoreRouting.MockDriver(this._config);
         } else {
           throw new Error('Unknown driver type "' + this.driver + '"');
         }
