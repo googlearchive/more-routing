@@ -150,7 +150,7 @@ TODO(nevir): Document.
       },
 
       _updateProxiedValues: function() {
-        this.active  = this.route && this.route.active;
+        this.active = this.route && this.route.active;
       },
 
       _observeRoute: function(route) {
@@ -159,6 +159,7 @@ TODO(nevir): Document.
         this._routeObserver.open(this._updateProxiedValues.bind(this));
       },
 
+      /** TODO(nevir): Break out into a shared helper/mixin */
       _findParent: function() {
         var node = this;
         while (node) {
