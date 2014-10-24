@@ -20,26 +20,23 @@
         <div>Route: /fizz</div>
         <div>Default Route</div>
       </core-pages>
-
-      <more-route-selector selectedIndex="{{extractedIndex}}" routes="{{extractedRoutes}}"></more-route-selector>
-      <core-pages id="extracted" selected="{{extractedIndex}}" values="{{extractedRoutes}}" valueattr="route">
-        <div route="stuff">Route: stuff</div>
-        <div route="/fizz">Route: /fizz</div>
-        <div route="/">Default Route</div>
-      </core-pages>
     </template>
 
     <script>
       var pages;
       function assertNavigated(route, index, done) {
         MoreRouting.navigateTo(route);
-        asyncPlatformFlush(function() {
+        flush(function() {
           assert.equal(pages.selectedIndex, index, 'selectedIndex mismatch for route "' + route + '"');
           done();
         });
       }
 
-      function commonBehavior() {
+      suite('routes declared with same order as pages', function() {
+        suiteSetup(function() {
+          pages = document.getElementById('ordered');
+        });
+
         beforeEach(function(done) {
           assertNavigated('/', 2, done);
         });
@@ -61,20 +58,6 @@
         test('navigates named routes', function(done) {
           assertNavigated('/foo/bar', 0, done);
         });
-      }
-
-      suite('routes declared with same order as pages', function() {
-        suiteSetup(function() {
-          pages = document.getElementById('ordered');
-        });
-        commonBehavior();
-      });
-
-      suite('routes extracted via values', function() {
-        suiteSetup(function() {
-          pages = document.getElementById('extracted');
-        });
-        commonBehavior();
       });
     </script>
   </body>

@@ -43,14 +43,16 @@ TODO(nevir): Document.
       /** @override */
       ready: function() {
         if (this.routes.length > 0 && this.children.length > 0) {
+          // We don't want to deal with ordering confusion.
           throw new Error('more-route-selector supports either routes="..." or child elements, not both');
         }
       },
 
       /** @override */
       attached: function() {
-        this._buildRoutes();
+        this.parent = this._findParent();
         this.async(function() {
+          this._buildRoutes();
           this._observeRoutes();
           this.evaluate();
         });
@@ -60,8 +62,8 @@ TODO(nevir): Document.
        * TODO(nevir): Document
        */
       evaluate: function() {
-        for (var i = 0, child; child = this.children[i]; i++) {
-          if (child.route.active) {
+        for (var i = 0, route; route = this._routeRefs[i]; i++) {
+          if (route.active) {
             this.selectedIndex = i;
             return;
           }
@@ -74,16 +76,32 @@ TODO(nevir): Document.
        * can ensure that we're adopting proper behavior for nesting/etc.
        */
       _buildRoutes: function() {
-        for (var i = 0, route; route = this.routes[i]; i++) {
-          var routeEl = this.ownerDocument.createElement('more-route');
-          if (MoreRouting.isPath(route)) {
-            routeEl.path = route;
-          } else {
-            routeEl.reference = true;  // TODO(nevir): This sucks.
-            routeEl.name = route;
-          }
-          this.appendChild(routeEl);
+        if (this.routes.length > 0) {
+          this._routeRefs = this._routesFromAttributes();
+        } else {
+          this._routeRefs = this._routesFromChildren();
         }
+      },
+
+      /** Return `Route` objects the routes defined by `routes`. */
+      _routesFromAttributes: function() {
+        var parentPath = this.parent && this.parent.path || '';
+        return this.routes.map(function(route) {
+          if (MoreRouting.isPath(route)) {
+            return MoreRouting.getRouteByPath(parentPath + route);
+          } else {
+            return MoreRouting.getRouteByName(route);
+          }
+        });
+      },
+
+      /** Return `Route` objects declared by child `more-route`s. */
+      _routesFromChildren: function() {
+        var result = [];
+        for (var i = 0, child; child = this.children[i]; i++) {
+          result.push(child.route);
+        }
+        return result;
       },
 
       /**
@@ -97,10 +115,23 @@ TODO(nevir): Document.
           this._observer.close();
         }
         this._observer = new CompoundObserver();
-        for (var i = 0, child; child = this.children[i]; i++) {
-          this._observer.addPath(child.route, 'active');
+        for (var i = 0, route; route = this._routeRefs[i]; i++) {
+          this._observer.addPath(route, 'active');
         }
         this._observer.open(this.evaluate.bind(this));
+      },
+
+      /** TODO(nevir): Break out into a shared helper/mixin */
+      _findParent: function() {
+        var node = this;
+        while (node) {
+          node = node.parentNode || node.host;
+          var route = node && node.moreRouteContext || node;
+          if (route instanceof this.constructor && route !== this) {
+            return route;
+          }
+        }
+        return null;
       },
     });
   </script>

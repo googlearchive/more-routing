@@ -11,6 +11,6 @@
     "core-scaffold": "Polymer/core-scaffold#master",
     "more-param": "Polymore/more-param#master",
     "webcomponentsjs": "Polymer/webcomponentsjs#master",
-    "web-component-tester": "Polymer/web-component-tester#^1.1.1"
+    "web-component-tester": "Polymer/web-component-tester#^1.2.0"
   }
 }
