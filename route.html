@@ -76,7 +76,7 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
       parts.push(config.part);
     } else if (config.type === 'param') {
       var value = params[config.name];
-      if (!value) {
+      if (value === undefined) {
         if (silent) {
           return null;
         } else {
