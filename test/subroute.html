@@ -32,13 +32,32 @@
         });
 
         test('navigates to nested route without specifying params', function(done) {
-          MoreRouting.navigateTo("userProfile");
-          done();
+          async.series([
+            function(cb) {
+              MoreRouting.navigateTo("userProfile");
+              cb();
+            },
+            animationFrameFlush,
+            function(cb) {
+              assert(MoreRouting.getRoute("user").params.userId !== undefined);
+              assert(MoreRouting.getRoute("userProfile").params.userId === MoreRouting.getRoute("user").params.userId);
+              cb()
+            }],
+            done);
         });
 
         test('navigates to nested route with specifying params', function(done) {
-          MoreRouting.navigateTo("userProfile", {userId: 2345});
-          done();
+          async.series([
+            function(cb) {
+              MoreRouting.navigateTo("userProfile", {userId: 2345});
+              cb();
+            },
+            animationFrameFlush,
+            function(cb) {
+              assert(MoreRouting.getRoute("user").params.userId == 2345);
+              cb()
+            }],
+            done);
         });
 
       });
