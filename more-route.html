@@ -127,7 +127,7 @@ TODO(nevir): Document.
           this.path     = this.route.path;
           this.fullPath = this.route.path;
         } else if (this.path && this.name) {
-          this.route    = MoreRouting.registerNamedRoute(this.name, fullPath);
+          this.route    = MoreRouting.registerNamedRoute(this.name, fullPath, this.parent ? this.parent.route : undefined);
           this.path     = this.path;
           this.fullPath = fullPath;
         } else if (this.path) {
