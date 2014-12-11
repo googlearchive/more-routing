@@ -13,20 +13,25 @@ var SEPARATOR_CLEANER = /\/\/+/g;
 /**
  * TODO(nevir): Docs.
  */
-function Route(path) {
+function Route(path, parent) {
   this.path     = path;
   this.compiled = this._compile(this.path);
   this.active   = false;
   this.driver   = null;
 
   this.parts = [];
+  this.parent = parent;
   /**
    * Param values matching the current URL, or an empty object if not `active`.
    *
    * To make data "binding" easy, `Route` guarantees that `params` will always
    * be the same object; just make a reference to it.
    */
-  this.params = {};
+  if (this.parent === undefined) {
+    this.params = {};
+  } else {
+    this.params = Object.create(this.parent.params);
+  }
 
   this._paramObserver = new ObjectObserver(this.params);
   this._paramObserver.open(this._navigateToParams.bind(this));
@@ -75,6 +80,9 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
     if (config.type === 'static') {
       parts.push(config.part);
     } else if (config.type === 'param') {
+      if (params === undefined) {
+        params = this.params;
+      }
       var value = params[config.name];
       if (value === undefined) {
         if (silent) {
@@ -99,8 +107,8 @@ Route.prototype.processPathParts = function processPathParts(parts) {
   this.parts  = parts;
   this.active = this.matchesPathParts(parts);
   for (var i = 0, config; config = this.compiled[i]; i++) {
-    if (config.type === 'param') {
-      this.params[config.name] = this.active ? parts[i] : undefined;
+    if (config.type === 'param' && this.active) {
+      this.params[config.name] = parts[i];
     }
   }
   this._paramObserver.discardChanges();
