@@ -26,7 +26,7 @@
       var pages, selector;
       function assertNavigated(path, index, selectedPath, done) {
         MoreRouting.navigateTo(path);
-        flush(function() {
+        animationFrameFlush(function() {
           assert.equal(pages.selectedIndex, index, 'selectedIndex mismatch for route "' + path + '"');
           assert.equal(selector.selectedPath, selectedPath, 'selectedPath mismatch');
           flush(done);
