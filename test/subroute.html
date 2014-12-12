@@ -16,7 +16,9 @@
 
     <script>
       var pages, selector;
-
+      var routeUserId = function routeUserId(route) {
+        return MoreRouting.getRoute(route).params.userId;
+      }
       suite('nested route behavior', function() {
         setup(function(done) {
           async.series([
@@ -36,8 +38,10 @@
             },
             flush,
             function(cb) {
-              assert(MoreRouting.getRoute("user").params.userId !== undefined, "userid should be 1234 got " + MoreRouting.getRoute("user").params.userId);
-              assert(MoreRouting.getRoute("userProfile").params.userId === MoreRouting.getRoute("user").params.userId);
+              assert(routeUserId("user") !== undefined,
+                     "route('user').userId should be defined");
+              assert(routeUserId("userProfile") === routeUserId("user"),
+                     "route('userProfile').userId should match route('user').userId");
               cb()
             }
           ], done);
@@ -51,7 +55,7 @@
             },
             flush,
             function(cb) {
-              assert(MoreRouting.getRoute("user").params.userId == 2345);
+              assert(routeUserId("user") === "2345");
               cb()
             }],
             done);
