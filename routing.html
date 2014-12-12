@@ -39,11 +39,12 @@ MoreRouting.getRoute = function getRoute(pathOrName) {
  * @return {MoreRouting.Route}
  */
 MoreRouting.getRouteByPath = function getRouteByPath(path, parent) {
-  if (!routesByPath[path]) {
-    routesByPath[path] = new this.Route(path, parent);
-    this.driver.manageRoute(routesByPath[path]);
+  var fullPath = (parent ? parent.getFullPath() : '') + path;
+  if (!routesByPath[fullPath]) {
+    routesByPath[fullPath] = new this.Route(path, parent);
+    this.driver.manageRoute(routesByPath[fullPath]);
   }
-  return routesByPath[path];
+  return routesByPath[fullPath];
 }
 
 /**
@@ -70,8 +71,9 @@ MoreRouting.registerNamedRoute = function registerNamedRoute(name, path, parent)
         'Overwriting route named "' + name + '" with path:', path,
         'previously:', pathsByName[name]);
   }
-  pathsByName[name] = path;
-  return this.getRouteByPath(path, parent);
+  var route = this.getRouteByPath(path, parent);
+  pathsByName[name] = route.getFullPath();
+  return route;
 };
 
 // Route Shortcuts
