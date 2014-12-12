@@ -26,11 +26,15 @@
       var pages, selector;
       function assertNavigated(path, index, selectedPath, done) {
         MoreRouting.navigateTo(path);
-        animationFrameFlush(function() {
-          assert.equal(pages.selectedIndex, index, 'selectedIndex mismatch for route "' + path + '"');
-          assert.equal(selector.selectedPath, selectedPath, 'selectedPath mismatch');
-          flush(done);
-        });
+        async.series([
+          flush,
+          flush,
+          function(cb) {
+            assert.equal(pages.selectedIndex, index, 'selectedIndex mismatch for route "' + path + '"');
+            assert.equal(selector.selectedPath, selectedPath, 'selectedPath mismatch');
+            cb();
+          }
+        ], done);
       }
 
       suite('routes declared with same order as pages', function() {

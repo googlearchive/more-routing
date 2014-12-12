@@ -8,13 +8,11 @@
     <link rel="import" href="../more-routing.html">
   </head>
   <body>
-    <template is="auto-binding">
       <more-routing driver="hash"></more-routing>
       <more-route name="user" path="/user/:userId">
         <more-route name="userSettings" path="/settings"></more-route>
         <more-route name="userProfile" path="/profile"></more-route>
       </more-route>
-    </template>
 
     <script>
       var pages, selector;
@@ -26,9 +24,8 @@
                 MoreRouting.navigateTo("userSettings", {userId: 1234});
                 cb();
               },
-              animationFrameFlush,
-            ]
-            ,done);
+              flush,
+            ], done);
         });
 
         test('navigates to nested route without specifying params', function(done) {
@@ -37,13 +34,13 @@
               MoreRouting.navigateTo("userProfile");
               cb();
             },
-            animationFrameFlush,
+            flush,
             function(cb) {
-              assert(MoreRouting.getRoute("user").params.userId !== undefined);
+              assert(MoreRouting.getRoute("user").params.userId !== undefined, "userid should be 1234 got " + MoreRouting.getRoute("user").params.userId);
               assert(MoreRouting.getRoute("userProfile").params.userId === MoreRouting.getRoute("user").params.userId);
               cb()
-            }],
-            done);
+            }
+          ], done);
         });
 
         test('navigates to nested route with specifying params', function(done) {
@@ -52,7 +49,7 @@
               MoreRouting.navigateTo("userProfile", {userId: 2345});
               cb();
             },
-            animationFrameFlush,
+            flush,
             function(cb) {
               assert(MoreRouting.getRoute("user").params.userId == 2345);
               cb()

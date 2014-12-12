@@ -27,10 +27,10 @@ function Route(path, parent) {
    * To make data "binding" easy, `Route` guarantees that `params` will always
    * be the same object; just make a reference to it.
    */
-  if (this.parent === undefined) {
-    this.params = {};
-  } else {
+  if (this.parent) {
     this.params = Object.create(this.parent.params);
+  } else {
+    this.params = {};
   }
 
   this._paramObserver = new ObjectObserver(this.params);
@@ -76,14 +76,19 @@ Route.prototype.isCurrentUrl = function isCurrentUrl(params) {
 
 Route.prototype.partsForParams = function partsForParams(params, silent) {
   var parts = [];
+  if (this.parent) {
+    parts = parts.concat(this.parent.partsForParams(params, silent));
+  }
   for (var i = 0, config; config = this.compiled[i]; i++) {
     if (config.type === 'static') {
       parts.push(config.part);
     } else if (config.type === 'param') {
-      if (params === undefined) {
-        params = this.params;
+      var value
+      if (params && config.name in params) {
+        value = params[config.name];
+      } else {
+        value = this.params[config.name];
       }
-      var value = params[config.name];
       if (value === undefined) {
         if (silent) {
           return null;
@@ -153,6 +158,10 @@ Route.prototype._navigateToParams = function _navigateToParams() {
   if (!parts) return;
   this.driver.navigateToParts(parts);
 };
+
+Route.prototype.getFullPath = function getFullPath() {
+  return (this.parent ? this.parent.getFullPath() : '') + this.toString();
+}
 
 })(window);
 </script>
