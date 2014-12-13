@@ -20,6 +20,7 @@ function Route(path, parent) {
   this.driver   = null;
 
   this.parts = [];
+  this.children = [];
   this.parent = parent;
   /**
    * Param values matching the current URL, or an empty object if not `active`.
@@ -29,6 +30,7 @@ function Route(path, parent) {
    */
   if (this.parent) {
     this.params = Object.create(this.parent.params);
+    this.parent.children.push(this);
   } else {
     this.params = {};
   }
@@ -110,10 +112,24 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
  */
 Route.prototype.processPathParts = function processPathParts(parts) {
   this.parts  = parts;
+  // If the route had been inactive, we manually zerod it.
+  if (!this.active) {
+    var keys = Object.keys(this.params);
+    for (var i = 0; i < keys.length; i++) {
+      delete this.params[keys[i]];
+    }
+  }
+  // Now we can depend on this.params.__proto__ for default values.
   this.active = this.matchesPathParts(parts);
-  for (var i = 0, config; config = this.compiled[i]; i++) {
-    if (config.type === 'param' && this.active) {
-      this.params[config.name] = parts[i];
+  if (this.active) {
+    for (var i = 0, config; config = this.compiled[i]; i++) {
+      if (config.type === 'param') {
+        this.params[config.name] = parts[i];
+      }
+    }
+  } else {
+    for (key in this.params) {
+      this.params[key] = undefined;
     }
   }
   this._paramObserver.discardChanges();
