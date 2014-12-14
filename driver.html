@@ -67,8 +67,35 @@ Driver.prototype.splitPath = function splitPath(rawPath) {
   return parts;
 };
 
-// Internal Implementation
+Driver.prototype.findParentPath = function findParentPath(rawPath, parentRoute, rootRoutes) {
+  var compiled, candidates, route;
+  compiled = MoreRouting.Route._compile(rawPath);
+  candidates = [].concat(rootRoutes || this._rootRoutes);
+  var compiledMatch = function compiledMatch(c1, c2) {
+    return (c1.name ? c1.name === c2.name : c1.part === c2.part) && c1.type === c2.type;
+  }
+  route = candidates.shift();
+  while (route != undefined) {
+    for (var i = 0; i < route.compiled.length; i++) {
+      if (!compiledMatch(route.compiled[i], compiled[i])) {
+        break;
+      } else if (i == route.compiled.length - 1) {
+        // Find the parent by searching this path's children, short-circuiting if it's the last match.
+        return this.findParentPath(rawPath.substring(route.path.length),
+                                   route,
+                                   route.children);
+      }
+    }
+    route = candidates.shift();
+  }
+  return {
+    parentRoute: parentRoute,
+    fullPath: (parentRoute ? parentRoute.getFullPath() : '') + rawPath, 
+    pathPart: rawPath
+  };
+}
 
+// Internal Implementation
 Driver.prototype._appendRoute = function _appendRoute(route) {
   if (route.parent) {
     // We only care about root routes.
@@ -80,7 +107,7 @@ Driver.prototype._appendRoute = function _appendRoute(route) {
 Driver.prototype._matchingRoutes = function _matchingRoutes(parts, rootRoutes) {
   var route, routes, cadidates, tail;
   routes = [];
-  candidates = rootRoutes || [].concat(this._rootRoutes);
+  candidates = [].concat(rootRoutes || this._rootRoutes);
   route = candidates.shift();
   while (route != undefined) {
     route.processPathParts(parts);

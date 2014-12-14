@@ -13,6 +13,7 @@
       <more-route name="userSettings" path="/settings"></more-route>
       <more-route name="userProfile" path="/profile"></more-route>
     </more-route>
+    <more-route name="userFavorites" path="/user/:userId/userFavorites"></more-route>
     <script>
       var pages, selector;
       var routeUserId = function routeUserId(route) {
@@ -55,6 +56,21 @@
             flush,
             function(cb) {
               assert(routeUserId("user") === "2345");
+              cb()
+            }
+          ], done);
+        });
+
+        test('Child routes implicitly created', function(done) {
+          async.series([
+            function(cb) {
+              MoreRouting.navigateTo("userFavorites", {userId: 2345});
+              cb();
+            },
+            flush,
+            function(cb) {
+              assert(routeUserId("user") === "2345");
+              assert(routeUserId("userFavorites") === "2345");
               cb()
             }
           ], done);

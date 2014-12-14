@@ -40,7 +40,14 @@ MoreRouting.getRoute = function getRoute(pathOrName) {
  */
 MoreRouting.getRouteByPath = function getRouteByPath(path, parent) {
   var fullPath = (parent ? parent.getFullPath() : '') + path;
+  var biz;
   if (!routesByPath[fullPath]) {
+    if (!parent) {
+      parent = this.driver.findParentPath(path);
+      path = parent.pathPart;
+      fullPath = parent.fullPath;
+      parent = parent.parentRoute;
+    }
     routesByPath[fullPath] = new this.Route(path, parent);
     this.driver.manageRoute(routesByPath[fullPath]);
   }

@@ -15,7 +15,7 @@ var SEPARATOR_CLEANER = /\/\/+/g;
  */
 function Route(path, parent) {
   this.path     = path;
-  this.compiled = this._compile(this.path);
+  this.compiled = Route._compile(this.path);
   this.active   = false;
   this.driver   = null;
 
@@ -152,7 +152,7 @@ Route.prototype.toString = function toString() {
 
 // Internal Implementation
 
-Route.prototype._compile = function _compile(rawPath) {
+Route._compile = function _compile(rawPath) {
   // Not strictly required, but helps us stay consistent w/ `getRoute`, etc.
   if (rawPath.indexOf(PART_SEPARATOR) !== 0) {
     throw new Error('Route paths must begin with a path separator; got: "' + rawPath + '"');
@@ -161,6 +161,7 @@ Route.prototype._compile = function _compile(rawPath) {
   if (path === '') return [];
 
   return path.split(PART_SEPARATOR).map(function(part) {
+    // raw fragment.
     if (part.substr(0, 1) == PARAM_SENTINEL) {
       return {type: 'param', name: part.substr(1)};
     } else {
