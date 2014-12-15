@@ -76,6 +76,7 @@ Driver.prototype.findParentPath = function findParentPath(rawPath, parentRoute, 
   }
   route = candidates.shift();
   while (route != undefined) {
+    if (compiled.length < route.compiled.length) break;
     for (var i = 0; i < route.compiled.length; i++) {
       if (!compiledMatch(route.compiled[i], compiled[i])) {
         break;
