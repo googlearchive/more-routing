@@ -15,7 +15,8 @@ var SEPARATOR_CLEANER = /\/\/+/g;
  */
 function Route(path, parent) {
   this.path     = path;
-  this.compiled = Route._compile(this.path);
+  this.fullPath = path;
+  this.compiled = this._compile(this.path);
   this.active   = false;
   this.driver   = null;
 
@@ -31,6 +32,7 @@ function Route(path, parent) {
   if (this.parent) {
     this.params = Object.create(this.parent.params);
     this.parent.children.push(this);
+    this.fullPath = this.parent.fullPath + this.fullPath;
   } else {
     this.params = {};
   }
@@ -77,10 +79,7 @@ Route.prototype.isCurrentUrl = function isCurrentUrl(params) {
 // Driver Interface
 
 Route.prototype.partsForParams = function partsForParams(params, silent) {
-  var parts = [];
-  if (this.parent) {
-    parts = parts.concat(this.parent.partsForParams(params, silent));
-  }
+  var parts = this.parent && this.parent.partsForParams(params, silent) || [];
   for (var i = 0, config; config = this.compiled[i]; i++) {
     if (config.type === 'static') {
       parts.push(config.part);
@@ -89,7 +88,7 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
       if (params && config.name in params) {
         value = params[config.name];
       } else {
-        value = this.params[config.name];
+        value = this.params[config.name] || this.params.prototype[config.name];
       }
       if (value === undefined) {
         if (silent) {
@@ -112,16 +111,12 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
  */
 Route.prototype.processPathParts = function processPathParts(parts) {
   this.parts  = parts;
-  // If the route had been inactive, we manually zerod it.
-  if (!this.active) {
+  this.active = this.matchesPathParts(parts);
+  if (this.active) {
     var keys = Object.keys(this.params);
     for (var i = 0; i < keys.length; i++) {
       delete this.params[keys[i]];
     }
-  }
-  // Now we can depend on this.params.__proto__ for default values.
-  this.active = this.matchesPathParts(parts);
-  if (this.active) {
     for (var i = 0, config; config = this.compiled[i]; i++) {
       if (config.type === 'param') {
         this.params[config.name] = parts[i];
@@ -152,7 +147,7 @@ Route.prototype.toString = function toString() {
 
 // Internal Implementation
 
-Route._compile = function _compile(rawPath) {
+Route.prototype._compile = function _compile(rawPath) {
   // Not strictly required, but helps us stay consistent w/ `getRoute`, etc.
   if (rawPath.indexOf(PART_SEPARATOR) !== 0) {
     throw new Error('Route paths must begin with a path separator; got: "' + rawPath + '"');
@@ -175,10 +170,6 @@ Route.prototype._navigateToParams = function _navigateToParams() {
   if (!parts) return;
   this.driver.navigateToParts(parts);
 };
-
-Route.prototype.getFullPath = function getFullPath() {
-  return (this.parent ? this.parent.getFullPath() : '') + this.toString();
-}
 
 })(window);
 </script>

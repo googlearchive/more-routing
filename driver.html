@@ -77,9 +77,9 @@ Driver.prototype._appendRoute = function _appendRoute(route) {
 };
 
 Driver.prototype._matchingRoutes = function _matchingRoutes(parts, rootRoutes) {
-  var route, routes, candidates;
-  routes = [];
-  candidates = rootRoutes || this._rootRoutes;
+  var routes = [];
+  var candidates = rootRoutes || this._rootRoutes;
+  var route;
   for (var i = 0; i < candidates.length; i++) {
     route = candidates[i];
     route.processPathParts(parts);
