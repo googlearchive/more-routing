@@ -61,7 +61,7 @@
           ], done);
         });
 
-        test('Child routes implicitly created', function(done) {
+        test('Same-path routes without parent/child relationships should work.', function(done) {
           async.series([
             function(cb) {
               MoreRouting.navigateTo("userFavorites", {userId: 2345});
