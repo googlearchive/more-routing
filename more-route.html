@@ -122,20 +122,16 @@ TODO(nevir): Document.
         if (!this.prepared) {
           return;
         }
-        var fullPath = (this.parent && this.parent.path || '') + this.path;
 
         if (this.name && this.reference) {
           this.route    = MoreRouting.getRouteByName(this.name);
           this.path     = this.route.path;
-          this.fullPath = this.route.path;
         } else if (this.path && this.name) {
           this.route    = MoreRouting.registerNamedRoute(this.name, this.path, this.parent && this.parent.route);
           this.path     = this.path;
-          this.fullPath = fullPath;
         } else if (this.path) {
           this.route    = MoreRouting.getRouteByPath(fullPath);
           this.path     = this.path;
-          this.fullPath = fullPath;
         } else {
           this.route    = null;
           this.path     = '';
