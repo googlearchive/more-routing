@@ -39,7 +39,7 @@
     </style>
 
     <header cross-fade>Forums</header>
-    <template repeat="{{forum in forums}}">
+    <template repeat="{{forum in _forumList}}">
       <section class="forum" on-tap="{{_onForumTapped}}">
         <paper-shadow hero-id="{{forum.id}}-container" hero cross-fade fit></paper-shadow>
         <paper-ripple fit></paper-ripple>
@@ -51,6 +51,13 @@
   </template>
   <script>
     Polymer('polyfora-forum-index', {
+      ready: function() {
+        this._forumList = [];
+        Object.keys(this.forums).forEach(function(key) {
+          this._forumList.push(this.forums[key]);
+        }.bind(this));
+      },
+
       _onForumTapped: function(event, detail, target) {
         target.querySelector('.title').removeAttribute('cross-fade');
 

@@ -5,7 +5,6 @@
     <script src="../../../../webcomponentsjs/webcomponents.js"></script>
     <link rel="import" href="../../../../polymer/polymer.html">
     <link rel="import" href="../../../../core-animated-pages/core-animated-pages.html">
-
     <link rel="import" href="../../../../font-roboto/roboto.html">
 
     <style>
@@ -30,6 +29,8 @@
       }
     </style>
 
+    <link rel="import" href="../../more-route-selector.html">
+
     <link rel="import" href="routes.html">
     <link rel="import" href="polyfora-data.html">
     <link rel="import" href="polyfora-forum-index.html">
@@ -41,10 +42,12 @@
 
       <header>Polyfora</header>
 
-      <core-animated-pages transitions="hero-transition cross-fade">
-        <polyfora-forum-index route="/" forums="{{forums}}"></polyfora-forum-index>
-        <polyfora-forum route="/forum/:forumId" forum="{{forums[0]}}"></polyfora-forum>
-      </core-animated-pages>
+      <more-route-selector selectedParams="{{params}}">
+        <core-animated-pages transitions="hero-transition cross-fade">
+          <polyfora-forum-index route="root"  forums="{{forums}}"></polyfora-forum-index>
+          <polyfora-forum       route="forum" forum="{{forums[params.forumId]}}"></polyfora-forum>
+        </core-animated-pages>
+      </more-route-selector>
 
     </template>
   </body>
