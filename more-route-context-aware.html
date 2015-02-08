@@ -1,0 +1,41 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="route.html">
+
+<!--
+TODO(nevir): Document.
+-->
+<polymer-element name="more-route-context-aware">
+  <script>
+    Polymer('more-route-context-aware', {
+
+      /** @override */
+      ready: function() {
+        setTimeout(function() {
+          console.debug('routing ready:', this);
+          this.parentRoute = this._findParentRoute();
+          this.routingIsReady = true;
+          this.routingReady();
+        }.bind(this), 0);
+      },
+
+      /**
+       * Extension point for subclasses. They can assume that the element has
+       * been initialized by this point.
+       */
+      routingReady: function() {},
+
+      _findParentRoute: function() {
+        var node = this;
+        while (node) {
+          node = node.parentNode || node.host;
+          var route = node && (node.moreRouteContext || node.route);
+          if (route instanceof MoreRouting.Route) {
+            return route;
+          }
+        }
+        return null;
+      },
+
+    });
+  </script>
+</polymer-element>

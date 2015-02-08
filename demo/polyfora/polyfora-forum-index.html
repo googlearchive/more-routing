@@ -53,14 +53,14 @@
     Polymer('polyfora-forum-index', {
       ready: function() {
         this._forumList = [];
-        Object.keys(this.forums).forEach(function(key) {
-          this._forumList.push(this.forums[key]);
+        Object.keys(this.forums).forEach(function(id) {
+          this._forumList.push(this.forums[id]);
         }.bind(this));
       },
 
       _onForumTapped: function(event, detail, target) {
-        target.querySelector('.title').removeAttribute('cross-fade');
-
+        var forum = target.templateInstance.model.forum;
+        MoreRouting.navigateTo('forum', {forumId: forum.id});
       },
     });
   </script>
