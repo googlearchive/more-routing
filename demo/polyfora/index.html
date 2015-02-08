@@ -44,8 +44,8 @@
 
       <more-route-selector selectedParams="{{params}}">
         <core-animated-pages transitions="hero-transition cross-fade">
-          <polyfora-forum-index route="root"  forums="{{forums}}"></polyfora-forum-index>
           <polyfora-forum       route="forum" forum="{{forums[params.forumId]}}"></polyfora-forum>
+          <polyfora-forum-index route="root"  forums="{{forums}}"></polyfora-forum-index>
         </core-animated-pages>
       </more-route-selector>
 

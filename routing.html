@@ -21,12 +21,13 @@ var pathsByName  = {};
  * this can be used as a route coercion function.
  *
  * @param {String|MoreRouting.Route} pathOrName
+ * @param {MoreRouting.Route} parent
  * @return {MoreRouting.Route}
  */
-MoreRouting.getRoute = function getRoute(pathOrName) {
+MoreRouting.getRoute = function getRoute(pathOrName, parent) {
   if (typeof pathOrName !== 'string') return pathOrName;
   if (this.isPath(pathOrName)) {
-    return this.getRouteByPath(pathOrName);
+    return this.getRouteByPath(pathOrName, parent);
   } else {
     return this.getRouteByName(pathOrName);
   }

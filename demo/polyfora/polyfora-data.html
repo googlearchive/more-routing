@@ -17,6 +17,12 @@
           desc: "Nine hundred years of time and space, and I've never been slapped by someone's mother. I think I might have miscalculated. I can't stand burnt toast. I loathe bus stations. Terrible places.",
         },
       },
+
+      ready: function() {
+        Object.keys(this.forums).forEach(function(id) {
+          this.forums[id].id = id;
+        }.bind(this));
+      },
     });
   </script>
 </polymer-element>

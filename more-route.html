@@ -99,11 +99,13 @@ TODO(nevir): Document.
         'active':    '_updateProxiedValues',
       },
 
-      domReady: function() {
-        this.parent = this._findParent();
-        this.reference = this.name && !this.path;
-        this.prepared = true;
-        this._identityChanged();
+      ready: function() {
+        this.async(function() {
+          this.parent = this._findParent();
+          this.reference = this.name && !this.path;
+          this.prepared = true;
+          this._identityChanged();
+        });
       },
 
       urlFor: function(params) {
@@ -161,8 +163,8 @@ TODO(nevir): Document.
         var node = this;
         while (node) {
           node = node.parentNode || node.host;
-          var route = node && node.moreRouteContext || node;
-          if (route instanceof this.constructor && route !== this) {
+          var route = node && (node.moreRouteContext || node.route);
+          if (route instanceof MoreRouting.Route) {
             return route;
           }
         }
