@@ -61,6 +61,14 @@
       _onForumTapped: function(event, detail, target) {
         var forum = target.templateInstance.model.forum;
         MoreRouting.navigateTo('forum', {forumId: forum.id});
+
+        var title = target.querySelector('.title');
+        title.removeAttribute('cross-fade');
+        // Really, we should be listening to core-animated-pages-transition-end,
+        // but that's painful for nested elements.
+        setTimeout(function() {
+          title.setAttribute('cross-fade', '');
+        }, 500);
       },
     });
   </script>

@@ -1,7 +1,7 @@
 <link rel="import" href="../../../../polymer/polymer.html">
 <link rel="import" href="../../../../paper-shadow/paper-shadow.html">
 
-<polymer-element name="polyfora-forum" attributes="forum" noscript>
+<polymer-element name="polyfora-forum" attributes="forum">
   <template>
     <style>
       :host {
@@ -23,7 +23,15 @@
       }
     </style>
 
-    <paper-shadow hero-id="{{forum.id}}-container" hero cross-fade fit></paper-shadow>
-    <header hero-id="{{forum.id}}-title" hero>{{forum.name}}</header>
+    <paper-shadow hero-id="{{_forum.id}}-container" hero cross-fade fit></paper-shadow>
+    <header hero-id="{{_forum.id}}-title" hero>{{_forum.name}}</header>
   </template>
+  <script>
+    Polymer('polyfora-forum', {
+      forumChanged: function() {
+        // We freeze the displayed forum so that transitions aren't wonky.
+        if (this.forum) this._forum = this.forum;
+      },
+    });
+  </script>
 </polymer-element>
