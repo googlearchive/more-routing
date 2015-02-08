@@ -38,12 +38,13 @@ MoreRouting.getRoute = function getRoute(pathOrName) {
  * @param {String} path
  * @return {MoreRouting.Route}
  */
-MoreRouting.getRouteByPath = function getRouteByPath(path) {
-  if (!routesByPath[path]) {
-    routesByPath[path] = new this.Route(path);
-    this.driver.manageRoute(routesByPath[path]);
+MoreRouting.getRouteByPath = function getRouteByPath(path, parent) {
+  var fullPath = (parent ? parent.fullPath : '') + path;
+  if (!routesByPath[fullPath]) {
+    routesByPath[fullPath] = new this.Route(path, parent);
+    this.driver.manageRoute(routesByPath[fullPath]);
   }
-  return routesByPath[path];
+  return routesByPath[fullPath];
 }
 
 /**
@@ -64,18 +65,18 @@ MoreRouting.getRouteByName = function getRouteByName(name) {
  * @param {String} path
  * @return {MoreRouting.Route} The newly registered route.
  */
-MoreRouting.registerNamedRoute = function registerNamedRoute(name, path) {
+MoreRouting.registerNamedRoute = function registerNamedRoute(name, path, parent) {
   if (pathsByName[name]) {
     console.warn(
         'Overwriting route named "' + name + '" with path:', path,
         'previously:', pathsByName[name]);
   }
-  pathsByName[name] = path;
-  return this.getRouteByPath(path);
+  var route = this.getRouteByPath(path, parent);
+  pathsByName[name] = route.fullPath;
+  return route;
 };
 
 // Route Shortcuts
-
 MoreRouting.urlFor = function urlFor(pathOrName, params) {
   return this.getRoute(pathOrName).urlFor(params);
 };

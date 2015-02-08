@@ -10,33 +10,46 @@
     <link rel="import" href="../../more-routing.html">
   </head>
   <body>
-    <template is="auto-binding">
+    <polymer-element name="core-pages-test">
+    <template>
       <more-routing driver="mock"></more-routing>
       <more-route name="stuff" path="/foo/bar"></more-route>
 
-      <more-route-selector selectedIndex="{{orderedIndex}}" routes="['stuff', '/fizz', '/']"></more-route-selector>
-      <core-pages selected="{{orderedIndex}}">
+      <more-route-selector id="selector" selectedIndex="{{orderedIndex}}" routes="['stuff', '/fizz', '/']"></more-route-selector>
+      <core-pages id="pages" selected="{{orderedIndex}}">
         <div>Route: stuff</div>
         <div>Route: /fizz</div>
         <div>Default Route</div>
       </core-pages>
     </template>
-
+    <script>
+    Polymer({
+    });
+    </script>
+  </polymer-element>
+  <core-pages-test></core-pages-test>
     <script>
       var pages, selector;
       function assertNavigated(path, index, selectedPath, done) {
-        MoreRouting.navigateTo(path);
-        flush(function() {
-          assert.equal(pages.selectedIndex, index, 'selectedIndex mismatch for route "' + path + '"');
-          assert.equal(selector.selectedPath, selectedPath, 'selectedPath mismatch');
-          flush(done);
-        });
+        async.series([
+          function(cb){
+            MoreRouting.navigateTo(path);
+            cb();
+          },
+          flush,
+          function(cb) {
+            assert.equal(pages.selectedIndex, index, 'selectedIndex mismatch for route "' + path + '"');
+            assert.equal(selector.selectedPath, selectedPath, 'selectedPath mismatch');
+            cb();
+          }
+        ], done);
       }
 
       suite('routes declared with same order as pages', function() {
         suiteSetup(function() {
-          pages    = document.querySelector('core-pages');
-          selector = document.querySelector('more-route-selector');
+          var container = document.querySelector('core-pages-test');
+          pages = container.$.pages;
+          selector = container.$.selector;
         });
 
         beforeEach(function(done) {
