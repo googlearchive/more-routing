@@ -124,27 +124,25 @@ TODO(nevir): Document.
         }
 
         if (this.name && this.reference) {
-          this.route    = MoreRouting.getRouteByName(this.name);
-          this.path     = this.route.path;
+          this.route = MoreRouting.getRouteByName(this.name);
         } else if (this.path && this.name) {
-          this.route    = MoreRouting.registerNamedRoute(this.name, this.path, this.parent && this.parent.route);
-          this.path     = this.path;
+          this.route = MoreRouting.registerNamedRoute(this.name, this.path, this.parent && this.parent.route);
         } else if (this.path) {
-          this.route    = MoreRouting.getRouteByPath(fullPath);
-          this.path     = this.path;
+          this.route = MoreRouting.getRouteByPath(this.path, this.parent);
         } else {
-          this.route    = null;
-          this.path     = '';
-          this.fullPath = '';
+          this.route = null;
         }
 
         if (this._routeObserver) this._routeObserver.close();
         if (this.route) {
-          this.params = this.route.params;
+          this.params   = this.route.params;
+          this.path     = this.route.path;
           this.fullPath = this.route.fullPath;
           this._observeRoute(this.route);
         } else {
-          this.params = {};
+          this.params   = {};
+          this.path     = '';
+          this.fullPath = '';
         }
       },
 
