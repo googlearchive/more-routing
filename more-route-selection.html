@@ -107,7 +107,6 @@ TODO(nevir): Document.
       },
 
       _evaluate: function() {
-        console.log('route changed');
         var newIndex = -1;
         var oldIndex = this.selectedIndex;
 
@@ -133,12 +132,6 @@ TODO(nevir): Document.
         this.selectedParams = newParams;
 
         this.fire('more-route-change', {
-          newRoute:  newRoute,  oldRoute:  oldRoute,
-          newIndex:  newIndex,  oldIndex:  oldIndex,
-          newPath:   newPath,   oldPath:   oldPath,
-          newParams: newParams, oldParams: oldParams,
-        });
-        console.debug({
           newRoute:  newRoute,  oldRoute:  oldRoute,
           newIndex:  newIndex,  oldIndex:  oldIndex,
           newPath:   newPath,   oldPath:   oldPath,
