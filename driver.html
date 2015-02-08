@@ -12,13 +12,7 @@ function Driver(opt_config) {
 
   this._activeRoutes = [];
 
-  // The root node for matching information. Each node can contain keys:
-  //
-  //  * `routes`:   Routes that match this node and its descendents.
-  //  * `static`:   A map of path parts to nodes.
-  //  * `wildcard`: A node that matches regardless of the part content.
-  //
-  this._root = {};
+  this._rootRoutes = [];
 }
 
 Driver.prototype.manageRoute = function manageRoute(route) {
@@ -49,14 +43,6 @@ Driver.prototype.setCurrentPath = function setCurrentPath(path) {
   this.currentPathParts = this.splitPath(path);
   var newRoutes = this._matchingRoutes(this.currentPathParts);
 
-  // Always update active routes.
-  for (var i = 0, route; route = newRoutes[i]; i++) {
-    route.processPathParts(this.currentPathParts);
-    if (!route.active) {
-      console.warn('Driver thinks route', route, 'should be active, but it is not');
-    }
-  }
-
   // active -> inactive.
   for (var i = 0, route; route = this._activeRoutes[i]; i++) {
     if (newRoutes.indexOf(route) === -1) {
@@ -82,46 +68,26 @@ Driver.prototype.splitPath = function splitPath(rawPath) {
 };
 
 // Internal Implementation
-
 Driver.prototype._appendRoute = function _appendRoute(route) {
-  var node = this._root;
-  for (var i = 0, config; config = route.compiled[i]; i++) {
-    if (config.type === 'static') {
-      if (!node.static) node.static = {};
-      if (!node.static[config.part]) node.static[config.part] = {};
-      node = node.static[config.part];
-    } else if (config.type === 'param') {
-      if (!node.wildcard) node.wildcard = {};
-      node = node.wildcard;
-    } else {
-      throw new Error('Unknown compiled route part type "' + config.type + '"');
-    }
+  if (route.parent) {
+    // We only care about root routes.
+    return;
   }
-
-  if (!node.routes) node.routes = [];
-  node.routes.push(route);
+  this._rootRoutes.push(route);
 };
 
-Driver.prototype._matchingRoutes = function _matchingRoutes(parts, currentNode) {
-  var node   = currentNode || this._root;
+Driver.prototype._matchingRoutes = function _matchingRoutes(parts, rootRoutes) {
   var routes = [];
-
-  if (node.routes) {
-    routes = routes.concat(node.routes);
-  }
-  if (parts.length > 0) {
-    var nextParts = parts.slice(1);
-    if (node.static) {
-      var child = node.static[parts[0]];
-      if (child) {
-        routes = routes.concat(this._matchingRoutes(nextParts, child));
-      }
-    }
-    if (node.wildcard) {
-      routes = routes.concat(this._matchingRoutes(nextParts, node.wildcard));
+  var candidates = rootRoutes || this._rootRoutes;
+  var route;
+  for (var i = 0; i < candidates.length; i++) {
+    route = candidates[i];
+    route.processPathParts(parts);
+    if (route.active) {
+      routes.push(route);
+      routes = routes.concat(this._matchingRoutes(parts.slice(route.compiled.length), route.children));
     }
   }
-
   return routes;
 }
 

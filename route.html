@@ -13,20 +13,29 @@ var SEPARATOR_CLEANER = /\/\/+/g;
 /**
  * TODO(nevir): Docs.
  */
-function Route(path) {
+function Route(path, parent) {
   this.path     = path;
+  this.fullPath = path;
   this.compiled = this._compile(this.path);
   this.active   = false;
   this.driver   = null;
 
   this.parts = [];
+  this.children = [];
+  this.parent = parent;
   /**
    * Param values matching the current URL, or an empty object if not `active`.
    *
    * To make data "binding" easy, `Route` guarantees that `params` will always
    * be the same object; just make a reference to it.
    */
-  this.params = {};
+  if (this.parent) {
+    this.params = Object.create(this.parent.params);
+    this.parent.children.push(this);
+    this.fullPath = this.parent.fullPath + this.fullPath;
+  } else {
+    this.params = {};
+  }
 
   this._paramObserver = new ObjectObserver(this.params);
   this._paramObserver.open(this._navigateToParams.bind(this));
@@ -70,12 +79,17 @@ Route.prototype.isCurrentUrl = function isCurrentUrl(params) {
 // Driver Interface
 
 Route.prototype.partsForParams = function partsForParams(params, silent) {
-  var parts = [];
+  var parts = this.parent && this.parent.partsForParams(params, silent) || [];
   for (var i = 0, config; config = this.compiled[i]; i++) {
     if (config.type === 'static') {
       parts.push(config.part);
     } else if (config.type === 'param') {
-      var value = params[config.name];
+      var value
+      if (params && config.name in params) {
+        value = params[config.name];
+      } else {
+        value = this.params[config.name] || this.params.prototype[config.name];
+      }
       if (value === undefined) {
         if (silent) {
           return null;
@@ -98,9 +112,19 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
 Route.prototype.processPathParts = function processPathParts(parts) {
   this.parts  = parts;
   this.active = this.matchesPathParts(parts);
-  for (var i = 0, config; config = this.compiled[i]; i++) {
-    if (config.type === 'param') {
-      this.params[config.name] = this.active ? parts[i] : undefined;
+  if (this.active) {
+    var keys = Object.keys(this.params);
+    for (var i = 0; i < keys.length; i++) {
+      delete this.params[keys[i]];
+    }
+    for (var i = 0, config; config = this.compiled[i]; i++) {
+      if (config.type === 'param') {
+        this.params[config.name] = parts[i];
+      }
+    }
+  } else {
+    for (key in this.params) {
+      this.params[key] = undefined;
     }
   }
   this._paramObserver.discardChanges();
@@ -132,6 +156,7 @@ Route.prototype._compile = function _compile(rawPath) {
   if (path === '') return [];
 
   return path.split(PART_SEPARATOR).map(function(part) {
+    // raw fragment.
     if (part.substr(0, 1) == PARAM_SENTINEL) {
       return {type: 'param', name: part.substr(1)};
     } else {

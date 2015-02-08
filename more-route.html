@@ -99,12 +99,11 @@ TODO(nevir): Document.
         'active':    '_updateProxiedValues',
       },
 
-      ready: function() {
-        this.reference = this.name && !this.path;
-      },
-
-      attached: function() {
+      domReady: function() {
         this.parent = this._findParent();
+        this.reference = this.name && !this.path;
+        this.prepared = true;
+        this._identityChanged();
       },
 
       urlFor: function(params) {
@@ -120,20 +119,19 @@ TODO(nevir): Document.
       },
 
       _identityChanged: function() {
-        var fullPath = (this.parent && this.parent.path || '') + this.path;
+        if (!this.prepared) {
+          return;
+        }
 
         if (this.name && this.reference) {
           this.route    = MoreRouting.getRouteByName(this.name);
           this.path     = this.route.path;
-          this.fullPath = this.route.path;
         } else if (this.path && this.name) {
-          this.route    = MoreRouting.registerNamedRoute(this.name, fullPath);
+          this.route    = MoreRouting.registerNamedRoute(this.name, this.path, this.parent && this.parent.route);
           this.path     = this.path;
-          this.fullPath = fullPath;
         } else if (this.path) {
           this.route    = MoreRouting.getRouteByPath(fullPath);
           this.path     = this.path;
-          this.fullPath = fullPath;
         } else {
           this.route    = null;
           this.path     = '';
@@ -143,6 +141,7 @@ TODO(nevir): Document.
         if (this._routeObserver) this._routeObserver.close();
         if (this.route) {
           this.params = this.route.params;
+          this.fullPath = this.route.fullPath;
           this._observeRoute(this.route);
         } else {
           this.params = {};
