@@ -1,0 +1,60 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+<link rel="import" href="../../../../paper-ripple/paper-ripple.html">
+<link rel="import" href="../../../../paper-shadow/paper-shadow.html">
+
+<polymer-element name="polyfora-forum-index" attributes="forums">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 16px;
+      }
+
+      :host > header {
+        font-size: 15px;
+        font-weight: 300;
+        color: #999999;
+      }
+
+      .forum {
+        position: relative;
+        margin: 8px 0;
+        padding: 8px;
+        cursor: pointer;
+      }
+
+      .forum > paper-shadow {
+        z-index: -1;
+      }
+
+      .title {
+        display: inline-block;
+        font-size: 20px;
+        font-weight: 400;
+      }
+
+      .description {
+        margin-top: 8px;
+      }
+    </style>
+
+    <header cross-fade>Forums</header>
+    <template repeat="{{forum in forums}}">
+      <section class="forum" on-tap="{{_onForumTapped}}">
+        <paper-shadow hero-id="{{forum.id}}-container" hero cross-fade fit></paper-shadow>
+        <paper-ripple fit></paper-ripple>
+
+        <header class="title" hero-id="{{forum.id}}-title" hero cross-fade>{{forum.name}}</header>
+        <div class="description" cross-fade>{{forum.desc}}</div>
+      </section>
+    </template>
+  </template>
+  <script>
+    Polymer('polyfora-forum-index', {
+      _onForumTapped: function(event, detail, target) {
+        target.querySelector('.title').removeAttribute('cross-fade');
+
+      },
+    });
+  </script>
+</polymer-element>
