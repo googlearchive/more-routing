@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="../../../../webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="../../../../polymer/polymer.html">
+    <link rel="import" href="../../../../core-animated-pages/core-animated-pages.html">
+
+    <link rel="import" href="../../../../font-roboto/roboto.html">
+
+    <style>
+      html, body {
+        height: 100%;
+        font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        margin: 0;
+        color: #666666;
+        font-size: 13px;
+      }
+
+      header {
+        font-size: 56px;
+        font-weight: 300;
+        padding: 16px;
+        background-color: #ff4080;
+        color: #ffffff;
+      }
+
+      core-animated-pages {
+        position: relative;
+      }
+    </style>
+
+    <link rel="import" href="routes.html">
+    <link rel="import" href="polyfora-data.html">
+    <link rel="import" href="polyfora-forum-index.html">
+    <link rel="import" href="polyfora-forum.html">
+  </head>
+  <body>
+    <template is="auto-binding">
+      <polyfora-data forums="{{forums}}"></polyfora-data>
+
+      <header>Polyfora</header>
+
+      <core-animated-pages transitions="hero-transition cross-fade">
+        <polyfora-forum-index route="/" forums="{{forums}}"></polyfora-forum-index>
+        <polyfora-forum route="/forum/:forumId" forum="{{forums[0]}}"></polyfora-forum>
+      </core-animated-pages>
+
+    </template>
+  </body>
+</html>

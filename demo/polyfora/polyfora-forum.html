@@ -1,0 +1,29 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+<link rel="import" href="../../../../paper-shadow/paper-shadow.html">
+
+<polymer-element name="polyfora-forum" attributes="forum" noscript>
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 16px;
+        min-height: 300px;
+      }
+
+      header {
+        display: inline-block;
+        font-size: 20px;
+        font-weight: 400;
+        position: relative;
+        z-index: 10;
+      }
+
+      :host > paper-shadow {
+        z-index: -1;
+      }
+    </style>
+
+    <paper-shadow hero-id="{{forum.id}}-container" hero cross-fade fit></paper-shadow>
+    <header hero-id="{{forum.id}}-title" hero>{{forum.name}}</header>
+  </template>
+</polymer-element>
