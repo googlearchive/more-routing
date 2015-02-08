@@ -16,12 +16,14 @@
         font-size: 13px;
       }
 
-      header {
+      .header {
+        background-color: #ff4080;
+        color: #ffffff;
+        display: block;
         font-size: 56px;
         font-weight: 300;
         padding: 16px;
-        background-color: #ff4080;
-        color: #ffffff;
+        text-decoration: none;
       }
 
       core-animated-pages {
@@ -40,7 +42,7 @@
     <template is="auto-binding">
       <polyfora-data forums="{{forums}}"></polyfora-data>
 
-      <header>Polyfora</header>
+      <a href="{{urlFor('root')}}" class="header">Polyfora</a>
 
       <more-route-selector selectedParams="{{params}}">
         <core-animated-pages transitions="hero-transition cross-fade">
