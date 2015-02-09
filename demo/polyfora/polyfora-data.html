@@ -41,12 +41,23 @@
 
       _generateThreads: function() {
         return generate(rand(3, 15), function() {
-          var title = phrase(6);
+          var title  = phrase(6);
+          var author = pick(this.users)
 
           return {
             id:     slug(title),
             title:  title,
-            author: pick(this.users),
+            author: author,
+            posts:  this._generatePosts(author),
+          };
+        }.bind(this));
+      },
+
+      _generatePosts: function(initialAuthor) {
+        return generate(rand(1, 5), function(i) {
+          return {
+            body:   paragraph(5),
+            author: i === 0 ? initialAuthor : pick(this.users),
           };
         }.bind(this));
       },
@@ -78,7 +89,7 @@
     function generate(times, callback) {
       var result = [];
       for (var i = 0; i < times; i++) {
-        result.push(callback());
+        result.push(callback(i));
       }
       return result;
     }

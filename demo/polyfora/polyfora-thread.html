@@ -15,12 +15,35 @@
       :host > paper-shadow {
         z-index: 0;
       }
+
+      .byline {
+        margin-bottom: 8px;
+      }
+
+      .post {
+        border-top:    1px solid #eeeeee;
+        border-bottom: 1px solid #eeeeee;
+        margin: -1px -16px 0 -16px;
+        padding: 8px 16px;
+      }
+
+      .post .author {
+        width: 64px;
+        text-align: right;
+      }
     </style>
 
     <paper-shadow hero-id="thread/{{_thread.id}}:container" hero cross-fade fit></paper-shadow>
 
     <header paper-font-style="headline" hero-id="thread/{{_thread.id}}:title" hero>{{_thread.title}}</header>
-    <div><span cross-fade>by </span><polyfora-user-ref user="{{_thread.author}}" hero></polyfora-user-ref></div>
+    <div class="byline"><span cross-fade>by </span><polyfora-user-ref user="{{_thread.author}}" hero></polyfora-user-ref></div>
+
+    <template repeat="{{post in _thread.posts}}">
+      <section class="post" layout horizontal cross-fade>
+        <div class="body" flex>{{post.body}}</div>
+        <polyfora-user-ref class="author" user="{{post.author}}" hero></polyfora-user-ref>
+      </section>
+    </template>
   </template>
   <script>
     Polymer('polyfora-thread', {
