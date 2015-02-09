@@ -15,7 +15,6 @@
     "paper-ripple": "Polymer/paper-ripple#^0.5.0",
     "paper-shadow": "Polymer/paper-shadow#^0.5.0",
     "web-component-tester": "*",
-    "webcomponentsjs": "Polymer/webcomponentsjs",
-    "paper-button": "Polymer/paper-button#~0.5.4"
+    "webcomponentsjs": "Polymer/webcomponentsjs"
   }
 }

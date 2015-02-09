@@ -1,0 +1,17 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+
+<polymer-element name="polyfora-user" attributes="user" noscript>
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 16px;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+    </style>
+
+    <header paper-font-style="headline" hero-id="{{user}}-user" hero>{{user.name}}</header>
+  </template>
+</polymer-element>

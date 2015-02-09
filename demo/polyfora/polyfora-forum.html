@@ -1,7 +1,8 @@
 <link rel="import" href="../../../../polymer/polymer.html">
-<link rel="import" href="../../../../paper-button/paper-button.html">
 <link rel="import" href="../../../../paper-ripple/paper-ripple.html">
 <link rel="import" href="../../../../paper-shadow/paper-shadow.html">
+
+<link rel="import" href="polyfora-user-ref.html">
 
 <polymer-element name="polyfora-forum" attributes="forum">
   <template>
@@ -13,56 +14,35 @@
         box-sizing: border-box;
       }
 
-      header {
-        display: inline-block;
-        font-size: 20px;
-        font-weight: 400;
-        position: relative;
-        z-index: 10;
-      }
-
       :host > paper-shadow {
-        z-index: -1;
+        z-index: 0;
       }
 
       .headers {
-        color: #aaaaaa;
         margin-top: 8px;
       }
 
-      .posts {
-        width: 4rem;
-        text-align: center;
+      .title, .posts, .author {
+        padding: 8px;
       }
 
       .author {
-        margin: 0;
-        width: 7rem;
-        text-align: center;
-        text-transform: inherit;
-      }
-      .author::shadow .button-content {
-        padding: 0;
-      }
-
-      .title {
-        font-size: 15px;
-        font-weight: 300;
-        padding: 0 8px;
+        width: 64px;
       }
 
       .thread {
         position: relative;
         margin: 8px 0;
         cursor: pointer;
-        line-height: 40px;
+        line-height: 24px; /* to match subhead */
       }
     </style>
 
     <paper-shadow hero-id="{{_forum.id}}-container" hero cross-fade fit></paper-shadow>
-    <header hero-id="{{_forum.id}}-title" hero>{{_forum.title}}</header>
 
-    <section class="headers" cross-fade layout horizontal>
+    <header paper-font-style="headline" hero-id="{{_forum.id}}-title" hero>{{_forum.title}}</header>
+
+    <section paper-font-style="caption" cross-fade layout horizontal>
       <div class="title" flex>Thread</div>
       <div class="posts">Posts</div>
       <div class="author">Author</div>
@@ -73,9 +53,9 @@
         <paper-shadow fit></paper-shadow>
         <paper-ripple fit></paper-ripple>
 
-        <div class="title" flex>{{thread.title}}</div>
+        <div class="title" paper-font-style="subhead" flex>{{thread.title}}</div>
         <div class="posts">7</div>
-        <paper-button class="author" on-tap="{{_onUserTapped}}">{{thread.author}}</paper-button>
+        <polyfora-user-ref class="author" user="{{thread.author}}"></polyfora-user-ref>
       </section>
     </template>
   </template>
@@ -91,12 +71,7 @@
         // In addition to routing via a `more-route` element, more-routing's
         // JavaScript API also exposes helpers:
         MoreRouting.navigateTo('thread', {forumId: this.forum.id, threadId: thread.id});
-      },
-
-      _onUserTapped: function(event, detail, target) {
-        var thread = target.templateInstance.model.thread;
-        MoreRouting.navigateTo('user', {userId: thread.author});
-        event.stopPropagation();  // Don't trigger thread tap.
+        event.stopPropagation();
       },
     });
   </script>
