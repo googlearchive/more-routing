@@ -105,17 +105,6 @@ TODO(nevir): Document.
         this.reference = this.name && !this.path;
         this._identityChangedCallCount = 0;
         this._identityChanged();
-
-        // This is a bit weird. We need to call `_identityChanged` immediately
-        // in `routingReady` so that parent routes resolve ASAP. However,
-        // template binding has (most likely) already queued up an observer
-        // callback for us.
-        //
-        // So, we ignore the *second* (queued up) call if it's within this task.
-        this.routingIsReady = false;
-        Polymer.endOfMicrotask(function() {
-          this.routingIsReady = true;
-        }.bind(this));
       },
 
       urlFor: function(params) {
