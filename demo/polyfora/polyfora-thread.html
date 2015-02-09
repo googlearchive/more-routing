@@ -1,0 +1,28 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+
+<polymer-element name="polyfora-thread" attributes="thread">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 16px;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      :host > paper-shadow {
+        z-index: 0;
+      }
+    </style>
+
+    <header paper-font-style="headline">{{_thread.title}}</header>
+  </template>
+  <script>
+    Polymer('polyfora-thread', {
+      threadChanged: function() {
+        // We freeze the displayed thread so that transitions aren't wonky.
+        if (this.thread) this._thread = this.thread;
+      },
+    });
+  </script>
+</polymer-element>

@@ -17,18 +17,20 @@
     <link rel="import" href="polyfora-data.html">
     <link rel="import" href="polyfora-forum-index.html">
     <link rel="import" href="polyfora-forum.html">
+    <link rel="import" href="polyfora-thread.html">
+    <link rel="import" href="polyfora-user.html">
   </head>
   <body>
     <template is="auto-binding">
-      <polyfora-data forums="{{forums}}"></polyfora-data>
+      <polyfora-data forums="{{forums}}" forumsById="{{forumsById}}" usersById="{{usersById}}"></polyfora-data>
 
       <!--
       more-routing exposes a `urlFor` helper that will construct a URL for a
       particular route (and params).
       -->
-      <a href="{{urlFor('root')}}" class="header core-header">Polyfora</a>
+      <a href="{{urlFor('root')}}" class="header" paper-font-style="display-2">Polyfora</a>
 
-      <div class="content">
+      <div class="content" paper-font-style="body-1">
         <!--
         `more-route-selector` manages any element that extends `core-selector`,
         allowing you to associate each with a route. By default, it looks for the
@@ -43,8 +45,15 @@
         -->
         <more-route-selector selectedParams="{{params}}">
           <core-animated-pages transitions="hero-transition cross-fade">
-            <polyfora-forum       route="forum" forum="{{forums[params.forumId]}}"></polyfora-forum>
-            <polyfora-forum-index route="root"  forums="{{forums}}"></polyfora-forum-index>
+            <!--
+            Note that `thread` MUST be listed before `forum`, as `forum` is
+            always active when `thread` is (`thread` is mounted under `forum`).
+            -->
+            <polyfora-thread      route="thread" thread="{{forumsById[params.forumId].threadsById[params.threadId]}}"></polyfora-thread>
+            <polyfora-forum       route="forum"  forum="{{forumsById[params.forumId]}}"></polyfora-forum>
+            <polyfora-user        route="user"   user="{{usersById[params.userId]}}"></polyfora-user>
+            <!-- Must be last: this is the default route. -->
+            <polyfora-forum-index route="root"   forums="{{forums}}"></polyfora-forum-index>
           </core-animated-pages>
         </more-route-selector>
 

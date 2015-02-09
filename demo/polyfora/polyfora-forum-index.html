@@ -12,12 +12,6 @@
         padding: 16px;
       }
 
-      :host > header {
-        font-size: 15px;
-        font-weight: 300;
-        color: #999999;
-      }
-
       .forum {
         position: relative;
         margin: 8px 0;
@@ -26,13 +20,7 @@
       }
 
       .forum > paper-shadow {
-        z-index: -1;
-      }
-
-      .title {
-        display: inline-block;
-        font-size: 20px;
-        font-weight: 400;
+        z-index: 0;
       }
 
       .description {
@@ -40,13 +28,14 @@
       }
     </style>
 
-    <header cross-fade>Forums</header>
+    <header paper-font-style="caption" cross-fade>Forums</header>
+
     <template repeat="{{forum in _forumList}}">
       <section class="forum" on-tap="{{_onForumTapped}}">
         <paper-shadow hero-id="{{forum.id}}-container" hero cross-fade fit></paper-shadow>
         <paper-ripple fit></paper-ripple>
 
-        <header class="title" hero-id="{{forum.id}}-title" hero cross-fade>{{forum.title}}</header>
+        <header paper-font-style="title" hero-id="{{forum.id}}-title" hero cross-fade>{{forum.title}}</header>
         <div class="description" cross-fade>{{forum.desc}}</div>
       </section>
     </template>
