@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <script src="../../../../webcomponentsjs/webcomponents.js"></script>
-    <link rel="import" href="../../../../polymer/polymer.html">
     <link rel="import" href="../../../../core-animated-pages/core-animated-pages.html">
     <link rel="import" href="../../../../font-roboto/roboto.html">
+    <link rel="import" href="../../more-route-selector.html">
 
     <style>
       html, body {
@@ -31,8 +31,12 @@
       }
     </style>
 
-    <link rel="import" href="../../more-route-selector.html">
 
+
+    <!--
+    `routes.html` configures more-routing, and specifies all of the named routes
+    for this application. Take a look at it.
+    -->
     <link rel="import" href="routes.html">
     <link rel="import" href="polyfora-data.html">
     <link rel="import" href="polyfora-forum-index.html">
@@ -42,8 +46,24 @@
     <template is="auto-binding">
       <polyfora-data forums="{{forums}}"></polyfora-data>
 
+      <!--
+      more-routing exposes a `urlFor` helper that will construct a URL for a
+      particular route (and params).
+      -->
       <a href="{{urlFor('root')}}" class="header">Polyfora</a>
 
+      <!--
+      `more-route-selector` manages any element that extends `core-selector`,
+      allowing you to associate each with a route. By default, it looks for the
+      `route` attribute on each item in the `core-selector`.
+
+      It will select first **first** item with an active route, and make that
+      route's params available via `selectedParams`.
+
+      Also, the items create _routing contexts_. Any routes declared within them
+      (including shadow roots) will be automatically nested! See
+      `polyfora-forum` for an example of this.
+      -->
       <more-route-selector selectedParams="{{params}}">
         <core-animated-pages transitions="hero-transition cross-fade">
           <polyfora-forum       route="forum" forum="{{forums[params.forumId]}}"></polyfora-forum>
