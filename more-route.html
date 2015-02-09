@@ -1,12 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <link rel="import" href="routing.html">
+<link rel="import" href="more-route-context-aware.html">
 
 <!--
 TODO(nevir): Document.
 
 -->
-<polymer-element name="more-route">
+<polymer-element name="more-route" extends="more-route-context-aware">
   <script>
     Polymer('more-route', {
       publish: {
@@ -99,13 +100,22 @@ TODO(nevir): Document.
         'active':    '_updateProxiedValues',
       },
 
-      ready: function() {
-        this.async(function() {
-          this.parent = this._findParent();
-          this.reference = this.name && !this.path;
-          this.prepared = true;
-          this._identityChanged();
-        });
+      /** @override */
+      routingReady: function() {
+        this.reference = this.name && !this.path;
+        this._identityChangedCallCount = 0;
+        this._identityChanged();
+
+        // This is a bit weird. We need to call `_identityChanged` immediately
+        // in `routingReady` so that parent routes resolve ASAP. However,
+        // template binding has (most likely) already queued up an observer
+        // callback for us.
+        //
+        // So, we ignore the *second* (queued up) call if it's within this task.
+        this.routingIsReady = false;
+        Polymer.endOfMicrotask(function() {
+          this.routingIsReady = true;
+        }.bind(this));
       },
 
       urlFor: function(params) {
@@ -121,16 +131,18 @@ TODO(nevir): Document.
       },
 
       _identityChanged: function() {
-        if (!this.prepared) {
-          return;
-        }
+        if (!this.routingIsReady) return;
+
+        this._identityChangedCallCount = this._identityChangedCallCount + 1;
+        if (this._identityChangedCallCount === 2) return;
 
         if (this.name && this.reference) {
           this.route = MoreRouting.getRouteByName(this.name);
         } else if (this.path && this.name) {
-          this.route = MoreRouting.registerNamedRoute(this.name, this.path, this.parent && this.parent.route);
+          console.log('registering:', this.name, this.path, this.parentRoute);
+          this.route = MoreRouting.registerNamedRoute(this.name, this.path, this.parentRoute);
         } else if (this.path) {
-          this.route = MoreRouting.getRouteByPath(this.path, this.parent);
+          this.route = MoreRouting.getRouteByPath(this.path, this.parentRoute);
         } else {
           this.route = null;
         }
@@ -163,18 +175,6 @@ TODO(nevir): Document.
         this._routeObserver.open(this._updateProxiedValues.bind(this));
       },
 
-      /** TODO(nevir): Break out into a shared helper/mixin */
-      _findParent: function() {
-        var node = this;
-        while (node) {
-          node = node.parentNode || node.host;
-          var route = node && (node.moreRouteContext || node.route);
-          if (route instanceof MoreRouting.Route) {
-            return route;
-          }
-        }
-        return null;
-      },
     });
   </script>
 </polymer-element>
