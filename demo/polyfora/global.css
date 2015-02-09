@@ -1,0 +1,21 @@
+html, body {
+  height: 100%;
+  font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  margin: 0;
+  color: #666666;
+  font-size: 13px;
+}
+
+.header {
+  background-color: #ff4080;
+  color: #ffffff;
+  display: block;
+  font-size: 56px;
+  font-weight: 300;
+  padding: 16px;
+  text-decoration: none;
+}
+
+core-animated-pages {
+  position: relative;
+}
