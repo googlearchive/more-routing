@@ -29,6 +29,11 @@
 
     <header paper-font-style="headline" hero-id="user/{{user.id}}:name" hero>{{user.name}}</header>
 
+    <!--
+    If your more-route-selector contains routes without any params, it can also
+    be driven in reverse! In this example, the user can tap a tab, and the URL
+    will be automatically updated to match the active tab.
+    -->
     <more-route-selector>
       <paper-tabs>
         <paper-tab route="/threads">Threads</paper-tab>
