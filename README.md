@@ -14,7 +14,7 @@ a breeze.
 TL;DR via [`more-route-selector`](#more-route-selector):
 
 ```html
-<more-routing-config driver="path"></more-routing>
+<more-routing-config driver="path"></more-routing-config>
 <more-route name="user" path="/users/:userId">
   <more-route name="user-bio" path="/bio"></more-route>
 </more-route>
@@ -44,7 +44,7 @@ TL;DR via [`more-route-selector`](#more-route-selector):
 TL;DR via [`more-route-switch`](#more-route-switch):
 
 ```html
-<more-routing-config driver="path"></more-routing>
+<more-routing-config driver="path"></more-routing-config>
 <more-route name="user" path="/users/:userId">
   <more-route name="user-bio" path="/bio"></more-route>
 </more-route>
@@ -85,7 +85,7 @@ Currently, this lets you declare which [driver](#MoreRouting.Driver) you wish
 to use (`hash` or `path`):
 
 ```html
-<more-routing-config driver="hash"></more-routing>
+<more-routing-config driver="hash"></more-routing-config>
 ```
 
 You should place this as early in the load process for your app as you can. Any
