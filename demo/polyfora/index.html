@@ -7,31 +7,7 @@
     <link rel="import" href="../../../../font-roboto/roboto.html">
     <link rel="import" href="../../more-route-selector.html">
 
-    <style>
-      html, body {
-        height: 100%;
-        font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-        margin: 0;
-        color: #666666;
-        font-size: 13px;
-      }
-
-      .header {
-        background-color: #ff4080;
-        color: #ffffff;
-        display: block;
-        font-size: 56px;
-        font-weight: 300;
-        padding: 16px;
-        text-decoration: none;
-      }
-
-      core-animated-pages {
-        position: relative;
-      }
-    </style>
-
-
+    <link rel="stylesheet" href="global.css">
 
     <!--
     `routes.html` configures more-routing, and specifies all of the named routes
@@ -50,26 +26,29 @@
       more-routing exposes a `urlFor` helper that will construct a URL for a
       particular route (and params).
       -->
-      <a href="{{urlFor('root')}}" class="header">Polyfora</a>
+      <a href="{{urlFor('root')}}" class="header core-header">Polyfora</a>
 
-      <!--
-      `more-route-selector` manages any element that extends `core-selector`,
-      allowing you to associate each with a route. By default, it looks for the
-      `route` attribute on each item in the `core-selector`.
+      <div class="content">
+        <!--
+        `more-route-selector` manages any element that extends `core-selector`,
+        allowing you to associate each with a route. By default, it looks for the
+        `route` attribute on each item in the `core-selector`.
 
-      It will select first **first** item with an active route, and make that
-      route's params available via `selectedParams`.
+        It will select first **first** item with an active route, and make that
+        route's params available via `selectedParams`.
 
-      Also, the items create _routing contexts_. Any routes declared within them
-      (including shadow roots) will be automatically nested! See
-      `polyfora-forum` for an example of this.
-      -->
-      <more-route-selector selectedParams="{{params}}">
-        <core-animated-pages transitions="hero-transition cross-fade">
-          <polyfora-forum       route="forum" forum="{{forums[params.forumId]}}"></polyfora-forum>
-          <polyfora-forum-index route="root"  forums="{{forums}}"></polyfora-forum-index>
-        </core-animated-pages>
-      </more-route-selector>
+        Also, the items create _routing contexts_. Any routes declared within them
+        (including shadow roots) will be automatically nested! See
+        `polyfora-forum` for an example of this.
+        -->
+        <more-route-selector selectedParams="{{params}}">
+          <core-animated-pages transitions="hero-transition cross-fade">
+            <polyfora-forum       route="forum" forum="{{forums[params.forumId]}}"></polyfora-forum>
+            <polyfora-forum-index route="root"  forums="{{forums}}"></polyfora-forum-index>
+          </core-animated-pages>
+        </more-route-selector>
+
+      </div>
 
     </template>
   </body>
