@@ -139,7 +139,6 @@ TODO(nevir): Document.
         if (this.name && this.reference) {
           this.route = MoreRouting.getRouteByName(this.name);
         } else if (this.path && this.name) {
-          console.log('registering:', this.name, this.path, this.parentRoute);
           this.route = MoreRouting.registerNamedRoute(this.name, this.path, this.parentRoute);
         } else if (this.path) {
           this.route = MoreRouting.getRouteByPath(this.path, this.parentRoute);
