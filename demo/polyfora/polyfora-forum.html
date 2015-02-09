@@ -22,10 +22,49 @@
       :host > paper-shadow {
         z-index: -1;
       }
+
+      .headers {
+        color: #aaaaaa;
+        padding: 8px;
+      }
+
+      .posts, .author {
+        width: 5rem;
+        text-align: right;
+      }
+
+      .title {
+        font-size: 15px;
+        font-weight: 300;
+      }
+
+      .thread {
+        position: relative;
+        margin: 8px 0;
+        padding: 8px;
+        cursor: pointer;
+      }
     </style>
 
     <paper-shadow hero-id="{{_forum.id}}-container" hero cross-fade fit></paper-shadow>
     <header hero-id="{{_forum.id}}-title" hero>{{_forum.title}}</header>
+
+    <section class="headers" cross-fade layout horizontal>
+      <div class="title" flex>Thread</div>
+      <div class="posts">Posts</div>
+      <div class="author">Author</div>
+    </section>
+
+    <template repeat="{{thread in _forum.threads}}">
+      <section class="thread" cross-fade layout horizontal center on-tap="{{_onThreadTapped}}">
+        <paper-shadow fit></paper-shadow>
+        <paper-ripple fit></paper-ripple>
+
+        <div class="title" flex>{{thread.title}}</div>
+        <div class="posts">7</div>
+        <div class="author">{{thread.author}}</div>
+      </section>
+    </template>
   </template>
   <script>
     Polymer('polyfora-forum', {
@@ -33,6 +72,13 @@
         // We freeze the displayed forum so that transitions aren't wonky.
         if (this.forum) this._forum = this.forum;
       },
+
+      _onThreadTapped: function(event, detail, target) {
+        var thread = target.templateInstance.model.thread;
+        // In addition to routing via a `more-route` element, more-routing's
+        // JavaScript API also exposes helpers:
+        MoreRouting.navigateTo('thread', {forumId: this.forum.id, threadId: thread.id});
+      }
     });
   </script>
 </polymer-element>

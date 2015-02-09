@@ -73,6 +73,9 @@
         // One way to navigate to a route is to call the `navigateTo` helper on
         // a `more-route` element that references it:
         this.$.forumRoute.navigateTo({forumId: forum.id});
+        // Another way is by calling `MoreRouting.navigateTo` with the name or
+        // path of the route and its params. You can see an example of this in
+        // `polyfora-forum.html`.
       },
 
       // We also want to know which forum has been routed to, so that we can set
