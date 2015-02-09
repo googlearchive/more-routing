@@ -10,14 +10,7 @@ TODO(nevir): Document.
 
       /** @override */
       ready: function() {
-        // We want to execute this as soon as possible, but async so that other
-        // routing contexts can set themselves up properly.
-        var whenReady = this._routeContextAwareReady.bind(this);
-        // So, we queue ourselves up with all the various ways of calling
-        // something async, and let the first one win.
-        Polymer.endOfMicrotask(whenReady);  // Probably.
-        this.async(whenReady);
-        setTimeout(whenReady, 0);
+        this._routeContextAwareReady();
       },
 
       /**
