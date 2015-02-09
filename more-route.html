@@ -149,7 +149,12 @@ TODO(nevir): Document.
       },
 
       _updateProxiedValues: function() {
+        var previousActive = this.active;
         this.active = this.route && this.route.active;
+
+        if (this.active === previousActive) return;
+        var eventName = 'more-route-' + (this.active ? 'active' : 'inactive');
+        this.fire(eventName, this.route);
       },
 
       _observeRoute: function(route) {
