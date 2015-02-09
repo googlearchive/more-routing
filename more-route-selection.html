@@ -77,12 +77,12 @@ TODO(nevir): Document.
       routesChanged: function() {
         if (!this.routingIsReady) return;
 
-        this._routeModels = this.routes.map(function(route) {
+        this.routeModels = this.routes.map(function(route) {
           return MoreRouting.getRoute(route, this.parentRoute);
         }.bind(this));
 
-        if (this._routeModels.length > 1 && this._routeModels[0].fullPath === '/') {
-          console.warn('You placed the route "/" first; no other routes will match ("/" is always active).', this._routeModels);
+        if (this.routeModels.length > 1 && this.routeModels[0].fullPath === '/') {
+          console.warn('You placed the route "/" first; no other routes will match ("/" is always active).', this.routeModels);
         }
 
         this._observeRoutes();
@@ -100,7 +100,7 @@ TODO(nevir): Document.
           this._observer.close();
         }
         this._observer = new CompoundObserver();
-        for (var i = 0, route; route = this._routeModels[i]; i++) {
+        for (var i = 0, route; route = this.routeModels[i]; i++) {
           this._observer.addPath(route, 'active');
         }
         this._observer.open(this._evaluate.bind(this));
@@ -110,7 +110,7 @@ TODO(nevir): Document.
         var newIndex = -1;
         var oldIndex = this.selectedIndex;
 
-        for (var i = 0, route; route = this._routeModels[i]; i++) {
+        for (var i = 0, route; route = this.routeModels[i]; i++) {
           if (route.active) {
             newIndex = i;
             break;
@@ -122,7 +122,7 @@ TODO(nevir): Document.
         var oldPath   = this.selectedPath;
         var oldParams = this.selectedParams;
 
-        var newRoute  = this._routeModels[newIndex];
+        var newRoute  = this.routeModels[newIndex];
         var newPath   = newRoute ? newRoute.path   : null;
         var newParams = newRoute ? newRoute.params : {};
 

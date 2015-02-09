@@ -82,6 +82,7 @@ TODO(nevir): Support child addition/removal/reorder.
       routingReady: function() {
         this._managedSelector   = this._findChildSelector();
         this.$.selection.routes = this._routesFromChildren();
+        this._observeManagedSelector();
       },
 
       /**
@@ -93,6 +94,17 @@ TODO(nevir): Support child addition/removal/reorder.
         if ('selected' in child && 'items' in child) {  // Quack!
           return child;
         }
+      },
+
+      _observeManagedSelector: function() {
+        if (!this._managedSelector) return;
+        this._observer = new PathObserver(this._managedSelector, 'selectedIndex');
+        this._observer.open(function(newIndex) {
+          if (this.selectedIndex === this._managedSelector.selectedIndex) return;
+          var route = this.$.selection.routeModels[newIndex];
+          if (!route) return;
+          route.navigateTo();
+        }.bind(this));
       },
 
       _routesFromChildren: function() {
