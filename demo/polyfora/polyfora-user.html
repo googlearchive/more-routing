@@ -1,5 +1,8 @@
 <link rel="import" href="../../../../polymer/polymer.html">
 
+
+<link rel="import" href="../../more-route-selector.html">
+
 <polymer-element name="polyfora-user" attributes="user" noscript>
   <template>
     <style>
@@ -10,8 +13,28 @@
         box-sizing: border-box;
       }
 
+      paper-tabs {
+        margin: 0 -16px;
+        border-bottom: 1px solid #ff4080;
+      }
+
+      paper-tabs::shadow #selectionBar {
+        background-color: #ff4080;
+      }
+
+      paper-tab::shadow #ink {
+        color: #ff4080;
+      }
     </style>
 
     <header paper-font-style="headline" hero-id="user/{{user.id}}:name" hero>{{user.name}}</header>
+
+    <more-route-selector>
+      <paper-tabs>
+        <paper-tab route="/threads">Threads</paper-tab>
+        <paper-tab route="/stats">Statistics</paper-tab>
+        <paper-tab route="/">Stuff</paper-tab>
+      </paper-tabs>
+    </more-route-selector>
   </template>
 </polymer-element>
