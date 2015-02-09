@@ -1,4 +1,6 @@
 <link rel="import" href="../../../../polymer/polymer.html">
+<link rel="import" href="../../../../paper-button/paper-button.html">
+<link rel="import" href="../../../../paper-ripple/paper-ripple.html">
 <link rel="import" href="../../../../paper-shadow/paper-shadow.html">
 
 <polymer-element name="polyfora-forum" attributes="forum">
@@ -25,24 +27,35 @@
 
       .headers {
         color: #aaaaaa;
-        padding: 8px;
+        margin-top: 8px;
       }
 
-      .posts, .author {
-        width: 5rem;
-        text-align: right;
+      .posts {
+        width: 4rem;
+        text-align: center;
+      }
+
+      .author {
+        margin: 0;
+        width: 7rem;
+        text-align: center;
+        text-transform: inherit;
+      }
+      .author::shadow .button-content {
+        padding: 0;
       }
 
       .title {
         font-size: 15px;
         font-weight: 300;
+        padding: 0 8px;
       }
 
       .thread {
         position: relative;
         margin: 8px 0;
-        padding: 8px;
         cursor: pointer;
+        line-height: 40px;
       }
     </style>
 
@@ -62,7 +75,7 @@
 
         <div class="title" flex>{{thread.title}}</div>
         <div class="posts">7</div>
-        <div class="author">{{thread.author}}</div>
+        <paper-button class="author" on-tap="{{_onUserTapped}}">{{thread.author}}</paper-button>
       </section>
     </template>
   </template>
@@ -78,7 +91,13 @@
         // In addition to routing via a `more-route` element, more-routing's
         // JavaScript API also exposes helpers:
         MoreRouting.navigateTo('thread', {forumId: this.forum.id, threadId: thread.id});
-      }
+      },
+
+      _onUserTapped: function(event, detail, target) {
+        var thread = target.templateInstance.model.thread;
+        MoreRouting.navigateTo('user', {userId: thread.author});
+        event.stopPropagation();  // Don't trigger thread tap.
+      },
     });
   </script>
 </polymer-element>
