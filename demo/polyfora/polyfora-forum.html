@@ -38,9 +38,9 @@
       }
     </style>
 
-    <paper-shadow hero-id="{{_forum.id}}-container" hero cross-fade fit></paper-shadow>
+    <paper-shadow hero-id="forum/{{_forum.id}}:container" hero cross-fade fit></paper-shadow>
 
-    <header paper-font-style="headline" hero-id="{{_forum.id}}-title" hero>{{_forum.title}}</header>
+    <header paper-font-style="headline" hero-id="forum/{{_forum.id}}:title" hero>{{_forum.title}}</header>
 
     <section paper-font-style="caption" cross-fade layout horizontal>
       <div class="title" flex>Thread</div>
@@ -50,10 +50,12 @@
 
     <template repeat="{{thread in _forum.threads}}">
       <section class="thread" cross-fade layout horizontal center on-tap="{{_onThreadTapped}}">
-        <paper-shadow fit></paper-shadow>
+        <paper-shadow fit hero-id="thread/{{thread.id}}:container" hero></paper-shadow>
         <paper-ripple fit></paper-ripple>
 
-        <div class="title" paper-font-style="subhead" flex>{{thread.title}}</div>
+        <div class="title" flex>
+          <span paper-font-style="subhead" hero-id="thread/{{thread.id}}:title" hero>{{thread.title}}</span>
+        </div>
         <div class="posts">7</div>
         <polyfora-user-ref class="author" user="{{thread.author}}"></polyfora-user-ref>
       </section>
@@ -72,6 +74,8 @@
         // JavaScript API also exposes helpers:
         MoreRouting.navigateTo('thread', {forumId: this.forum.id, threadId: thread.id});
         event.stopPropagation();
+
+        target.querySelector('.author').makeHero();
       },
     });
   </script>

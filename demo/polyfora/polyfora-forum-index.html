@@ -32,10 +32,10 @@
 
     <template repeat="{{forum in _forumList}}">
       <section class="forum" on-tap="{{_onForumTapped}}">
-        <paper-shadow hero-id="{{forum.id}}-container" hero cross-fade fit></paper-shadow>
+        <paper-shadow hero-id="forum/{{forum.id}}:container" hero cross-fade fit></paper-shadow>
         <paper-ripple fit></paper-ripple>
 
-        <header paper-font-style="title" hero-id="{{forum.id}}-title" hero cross-fade>{{forum.title}}</header>
+        <header paper-font-style="title" hero-id="forum/{{forum.id}}:title" hero cross-fade>{{forum.title}}</header>
         <div class="description" cross-fade>{{forum.desc}}</div>
       </section>
     </template>
@@ -72,7 +72,7 @@
       _onForumRouteActive: function(event, detail, route) {
         // Don't cross fade the title (it leaves a ghost); we just want it to
         // hero.
-        var title = this.shadowRoot.querySelector('[hero-id="' + route.params.forumId + '-title"]');
+        var title = this.shadowRoot.querySelector('[hero-id="forum/' + route.params.forumId + ':title"]');
         title.removeAttribute('cross-fade');
         // Really, we should be listening to core-animated-pages-transition-end,
         // but that's painful for nested elements.
