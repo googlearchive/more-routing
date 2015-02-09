@@ -5,22 +5,40 @@
     Polymer('polyfora-data', {
       forums: {
         whovianism: {
-          name: 'Whovianism',
+          title: 'Whovianism',
           desc: "Nine hundred years of time and space, and I've never been slapped by someone's mother. I think I might have miscalculated. I can't stand burnt toast. I loathe bus stations. Terrible places.",
         },
         asdf: {
-          name: 'Asdf',
+          title: 'Asdf',
           desc: "Nine hundred years of time and space, and I've never been slapped by someone's mother. I think I might have miscalculated. I can't stand burnt toast. I loathe bus stations. Terrible places.",
         },
         fdsa: {
-          name: 'Fdsa',
+          title: 'Fdsa',
+          desc: "Nine hundred years of time and space, and I've never been slapped by someone's mother. I think I might have miscalculated. I can't stand burnt toast. I loathe bus stations. Terrible places.",
+        },
+        asdf2: {
+          title: 'Asdf 2',
+          desc: "Nine hundred years of time and space, and I've never been slapped by someone's mother. I think I might have miscalculated. I can't stand burnt toast. I loathe bus stations. Terrible places.",
+        },
+        fdsa2: {
+          title: 'Fdsa 2',
           desc: "Nine hundred years of time and space, and I've never been slapped by someone's mother. I think I might have miscalculated. I can't stand burnt toast. I loathe bus stations. Terrible places.",
         },
       },
 
       ready: function() {
         Object.keys(this.forums).forEach(function(id) {
-          this.forums[id].id = id;
+          var forum = this.forums[id];
+          forum.id = id;
+
+          forum.threads = [];
+          for (var i = 0; i < 100; i++) {
+            forum.threads.push({
+              id:     i,
+              title:  'Thread ' + i,
+              author: 'fizz',
+            })
+          }
         }.bind(this));
       },
     });

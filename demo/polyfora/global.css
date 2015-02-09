@@ -10,10 +10,23 @@ html, body {
   background-color: #ff4080;
   color: #ffffff;
   display: block;
-  font-size: 56px;
+  font-size: 45px;
   font-weight: 300;
-  padding: 16px;
+  padding: 0 16px;
   text-decoration: none;
+  line-height: 70px;
+  height: 70px;
+}
+
+.content {
+  position: relative;
+  height: calc(100% - 70px);
+  overflow-y: auto;
+}
+
+more-route-selector, core-animated-pages {
+  display: block;
+  height: 100%;
 }
 
 core-animated-pages {
