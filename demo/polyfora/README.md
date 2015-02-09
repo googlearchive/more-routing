@@ -7,7 +7,7 @@ Notes and implementation details are expressed throughout the various source fil
 
 ## Index of Examples
 
-* [`<more-routing>` global configuration](routes.html##L4-9)
+* [`<more-routing-config>` global configuration](routes.html##L4-9)
 * [Pre-declaring named routes (routemapping)](routes.html#L11-26)
 * [Nested route declarations](routes.html#L19-25)
 * [`urlFor` helper](index.html#L28-32)

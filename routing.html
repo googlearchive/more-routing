@@ -113,7 +113,7 @@ var driver;
 Object.defineProperty(MoreRouting, 'driver', {
   get: function getDriver() {
     if (!driver) {
-      throw new Error('No routing driver configured. Did you forget <more-routing>?');
+      throw new Error('No routing driver configured. Did you forget <more-routing-config>?');
     }
     return driver;
   },

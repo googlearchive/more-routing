@@ -14,7 +14,7 @@ a breeze.
 TL;DR via [`more-route-selector`](#more-route-selector):
 
 ```html
-<more-routing driver="path"></more-routing>
+<more-routing-config driver="path"></more-routing>
 <more-route name="user" path="/users/:userId">
   <more-route name="user-bio" path="/bio"></more-route>
 </more-route>
@@ -44,7 +44,7 @@ TL;DR via [`more-route-selector`](#more-route-selector):
 TL;DR via [`more-route-switch`](#more-route-switch):
 
 ```html
-<more-routing driver="path"></more-routing>
+<more-routing-config driver="path"></more-routing>
 <more-route name="user" path="/users/:userId">
   <more-route name="user-bio" path="/bio"></more-route>
 </more-route>
@@ -75,7 +75,7 @@ Element API
 ===========
 
 <a name="more-routing"></a>
-`<more-routing>`
+`<more-routing-config>`
 ----------------
 
 _Defined in [`more-routing.html`](more-routing.html)._
@@ -85,7 +85,7 @@ Currently, this lets you declare which [driver](#MoreRouting.Driver) you wish
 to use (`hash` or `path`):
 
 ```html
-<more-routing driver="hash"></more-routing>
+<more-routing-config driver="hash"></more-routing>
 ```
 
 You should place this as early in the load process for your app as you can. Any
@@ -285,7 +285,7 @@ Before you can make use of navigation and URL parsing, a driver must be
 registered. Simply assign an instance of `MoreRouting.Driver` to this property.
 
 This is exposed as a declarative element via
-[`<more-routing driver="...">`](#more-routing).
+[`<more-routing-config driver="...">`](#more-routing).
 
 
 <a name="MoreRouting.getRoute"></a>
