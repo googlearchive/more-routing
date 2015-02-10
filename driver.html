@@ -18,7 +18,17 @@ function Driver(opt_config) {
 Driver.prototype.manageRoute = function manageRoute(route) {
   route.driver = this;
   this._appendRoute(route);
-  route.processPathParts(this.currentPathParts);
+
+  if (route.parent) {
+    if (route.parent.active) {
+      // Remember: `processPathParts` takes just the path parts relative to that
+      // route; not the full set.
+      route.processPathParts(this.currentPathParts.slice(route.parent.depth));
+    }
+  } else {
+    route.processPathParts(this.currentPathParts);
+  }
+
   if (route.active) this._activeRoutes.push(route);
 };
 
