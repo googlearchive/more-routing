@@ -82,7 +82,8 @@ TODO(nevir): Support child addition/removal/reorder.
       routingReady: function() {
         this._managedSelector   = this._findChildSelector();
         this.$.selection.routes = this._routesFromChildren();
-        this._observeManagedSelector();
+        // Give the managed selector time to spin up.
+        this.async(this._observeManagedSelector);
       },
 
       selectedIndexChanged: function() {
@@ -103,6 +104,7 @@ TODO(nevir): Support child addition/removal/reorder.
 
       _observeManagedSelector: function() {
         if (!this._managedSelector) return;
+
         this._observer = new PathObserver(this._managedSelector, 'selectedIndex');
         this._observer.open(function(newIndex) {
           if (this.selectedIndex === this._managedSelector.selectedIndex) return;
