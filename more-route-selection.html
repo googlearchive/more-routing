@@ -111,7 +111,7 @@ TODO(nevir): Document.
         var oldIndex = this.selectedIndex;
 
         for (var i = 0, routeInfo; routeInfo = this._routeInfo[i]; i++) {
-          if (routeInfo.model.active) {
+          if (routeInfo.model && routeInfo.model.active) {
             newIndex = routeInfo.index;
             newRoute = routeInfo.model;
             break;
@@ -144,8 +144,12 @@ TODO(nevir): Document.
        */
       _sortIndexes: function(routeInfo) {
         return routeInfo.sort(function(a, b) {
+          if (!a.model) {
+            return 1;
+          } else if (!b.model) {
+            return -1;
           // Routes with more path parts are most definitely more specific.
-          if (a.model.depth < b.model.depth) {
+          } else if (a.model.depth < b.model.depth) {
             return 1;
           } if (a.model.depth > b.model.depth) {
             return -1;

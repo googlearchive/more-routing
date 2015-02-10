@@ -34,6 +34,16 @@ TODO(nevir): Document.
         path: '',
 
         /**
+         * Whether this route should become a context for the element that
+         * contains it.
+         *
+         * @attribute context
+         * @type Boolean
+         * @default false
+         */
+        context: false,
+
+        /**
          * The full path expression for this route, including routes this is
          * nested within.
          *
@@ -145,6 +155,15 @@ TODO(nevir): Document.
           this.params   = {};
           this.path     = '';
           this.fullPath = '';
+        }
+
+        if (this.hasAttribute('context')) {
+          var parent = this.parentElement || this.parentNode && this.parentNode.host;
+          if (!parent) {
+            console.warn(this, 'wants to create a routing context, but it has no parent');
+            return;
+          }
+          parent.moreRouteContext = this.route;
         }
       },
 

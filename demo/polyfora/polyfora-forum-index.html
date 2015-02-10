@@ -4,8 +4,10 @@
 
 <link rel="import" href="../../more-route.html">
 
-<polymer-element name="polyfora-forum-index" attributes="forums">
+<polymer-element name="polyfora-forum-index" attributes="data">
   <template>
+    <more-route context name="root"></more-route>
+
     <style>
       :host {
         display: block;
@@ -52,8 +54,8 @@
     Polymer('polyfora-forum-index', {
       ready: function() {
         this._forumList = [];
-        Object.keys(this.forums).forEach(function(id) {
-          this._forumList.push(this.forums[id]);
+        Object.keys(this.data.forums).forEach(function(id) {
+          this._forumList.push(this.data.forums[id]);
         }.bind(this));
       },
 
