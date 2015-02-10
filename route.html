@@ -15,6 +15,7 @@ var SEPARATOR_CLEANER = /\/\/+/g;
  */
 function Route(path, parent) {
   this.path     = path;
+  this.parent   = parent;
   this.fullPath = path;
   this.compiled = this._compile(this.path);
   this.active   = false;
@@ -22,7 +23,7 @@ function Route(path, parent) {
 
   this.parts = [];
   this.children = [];
-  this.parent = parent;
+
   /**
    * Param values matching the current URL, or an empty object if not `active`.
    *
@@ -33,8 +34,10 @@ function Route(path, parent) {
     this.params = Object.create(this.parent.params);
     this.parent.children.push(this);
     this.fullPath = this.parent.fullPath + this.fullPath;
+    this.depth    = this.parent.depth + this.compiled.length;
   } else {
     this.params = {};
+    this.depth  = this.compiled.length;
   }
 
   this._paramObserver = new ObjectObserver(this.params);

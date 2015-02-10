@@ -37,24 +37,16 @@
         allowing you to associate each with a route. By default, it looks for the
         `route` attribute on each item in the `core-selector`.
 
-        It will select first **first** item with an active route, and make that
-        route's params available via `selectedParams`.
-
         Also, the items create _routing contexts_. Any routes declared within them
         (including shadow roots) will be automatically nested! See
         `polyfora-forum` for an example of this.
         -->
         <more-route-selector selectedParams="{{params}}">
           <core-animated-pages transitions="hero-transition cross-fade">
-            <!--
-            Note that `thread` MUST be listed before `forum`, as `forum` is
-            always active when `thread` is (`thread` is mounted under `forum`).
-            -->
-            <polyfora-thread      route="thread" thread="{{forumsById[params.forumId].threadsById[params.threadId]}}"></polyfora-thread>
-            <polyfora-forum       route="forum"  forum="{{forumsById[params.forumId]}}"></polyfora-forum>
-            <polyfora-user        route="user"   user="{{usersById[params.userId]}}"></polyfora-user>
-            <!-- Must be last: this is the default route. -->
             <polyfora-forum-index route="root"   forums="{{forums}}"></polyfora-forum-index>
+            <polyfora-user        route="user"   user="{{usersById[params.userId]}}"></polyfora-user>
+            <polyfora-forum       route="forum"  forum="{{forumsById[params.forumId]}}"></polyfora-forum>
+            <polyfora-thread      route="thread" thread="{{forumsById[params.forumId].threadsById[params.threadId]}}"></polyfora-thread>
           </core-animated-pages>
         </more-route-selector>
 

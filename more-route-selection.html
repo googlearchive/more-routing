@@ -77,13 +77,12 @@ TODO(nevir): Document.
       routesChanged: function() {
         if (!this.routingIsReady) return;
 
-        this.routeModels = this.routes.map(function(route) {
-          return MoreRouting.getRoute(route, this.parentRoute);
-        }.bind(this));
-
-        if (this.routeModels.length > 1 && this.routeModels[0].fullPath === '/') {
-          console.warn('You placed the route "/" first; no other routes will match ("/" is always active).', this.routeModels);
-        }
+        this._routeInfo = this._sortIndexes(this.routes.map(function(route, index) {
+          return {
+            model: MoreRouting.getRoute(route, this.parentRoute),
+            index: index,
+          };
+        }.bind(this)));
 
         this._observeRoutes();
         this._evaluate();
@@ -100,19 +99,21 @@ TODO(nevir): Document.
           this._observer.close();
         }
         this._observer = new CompoundObserver();
-        for (var i = 0, route; route = this.routeModels[i]; i++) {
-          this._observer.addPath(route, 'active');
+        for (var i = 0, routeInfo; routeInfo = this._routeInfo[i]; i++) {
+          this._observer.addPath(routeInfo.model, 'active');
         }
         this._observer.open(this._evaluate.bind(this));
       },
 
       _evaluate: function() {
         var newIndex = -1;
+        var newRoute = null;
         var oldIndex = this.selectedIndex;
 
-        for (var i = 0, route; route = this.routeModels[i]; i++) {
-          if (route.active) {
-            newIndex = i;
+        for (var i = 0, routeInfo; routeInfo = this._routeInfo[i]; i++) {
+          if (routeInfo.model.active) {
+            newIndex = routeInfo.index;
+            newRoute = routeInfo.model;
             break;
           }
         }
@@ -122,7 +123,6 @@ TODO(nevir): Document.
         var oldPath   = this.selectedPath;
         var oldParams = this.selectedParams;
 
-        var newRoute  = this.routeModels[newIndex];
         var newPath   = newRoute ? newRoute.path   : null;
         var newParams = newRoute ? newRoute.params : {};
 
@@ -136,6 +136,22 @@ TODO(nevir): Document.
           newIndex:  newIndex,  oldIndex:  oldIndex,
           newPath:   newPath,   oldPath:   oldPath,
           newParams: newParams, oldParams: oldParams,
+        });
+      },
+
+      /**
+       * We want the most specific routes to match first, so we must create a
+       * mapping of indexes within `routes` that map
+       */
+      _sortIndexes: function(routeInfo) {
+        return routeInfo.sort(function(a, b) {
+          if (a.model.depth < b.model.depth) {
+            return 1;
+          } if (a.model.depth > b.model.depth) {
+            return -1;
+          } else {
+            return 0;
+          }
         });
       },
 
