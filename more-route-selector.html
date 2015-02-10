@@ -86,7 +86,7 @@ TODO(nevir): Support child addition/removal/reorder.
       },
 
       selectedIndexChanged: function() {
-        if (!this._managedSelector) return;
+        if (!this.routingIsReady || !this._managedSelector) return;
         this._managedSelector.selected = this.selectedIndex;
       },
 

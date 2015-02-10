@@ -10,6 +10,14 @@ TODO(nevir): Document.
 
       /** @override */
       ready: function() {
+        // We're being stamped by a template; we need to defer until the
+        // template instance has been appended to the document.
+        if (!this.parentElement && !this.host && this.templateInstance) return;
+        this._routeContextAwareReady();
+      },
+
+      /** @override */
+      domReady: function() {
         this._routeContextAwareReady();
       },
 
