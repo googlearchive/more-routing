@@ -85,6 +85,11 @@ TODO(nevir): Support child addition/removal/reorder.
         this._observeManagedSelector();
       },
 
+      selectedIndexChanged: function() {
+        if (!this._managedSelector) return;
+        this._managedSelector.selected = this.selectedIndex;
+      },
+
       /**
        * Are we managing a `core-selector`?
        */
@@ -101,7 +106,7 @@ TODO(nevir): Support child addition/removal/reorder.
         this._observer = new PathObserver(this._managedSelector, 'selectedIndex');
         this._observer.open(function(newIndex) {
           if (this.selectedIndex === this._managedSelector.selectedIndex) return;
-          var route = this.$.selection.routeModels[newIndex];
+          var route = this.$.selection.routes[newIndex];
           if (!route) return;
           route.navigateTo();
         }.bind(this));
@@ -125,11 +130,6 @@ TODO(nevir): Support child addition/removal/reorder.
         }
 
         return routes;
-      },
-
-      selectedIndexChanged: function() {
-        if (!this._managedSelector) return;
-        this._managedSelector.selected = this.selectedIndex;
       },
 
     });
