@@ -33,11 +33,13 @@ function Route(path, parent) {
   if (this.parent) {
     this.params = Object.create(this.parent.params);
     this.parent.children.push(this);
-    this.fullPath = this.parent.fullPath + this.fullPath;
-    this.depth    = this.parent.depth + this.compiled.length;
+    this.fullPath  = this.parent.fullPath + this.fullPath;
+    this.depth     = this.parent.depth + this.compiled.length;
+    this.numParams = this.parent.numParams + countParams(this.compiled);
   } else {
-    this.params = {};
-    this.depth  = this.compiled.length;
+    this.params    = {};
+    this.depth     = this.compiled.length;
+    this.numParams = countParams(this.compiled);
   }
 
   this._paramObserver = new ObjectObserver(this.params);
@@ -173,6 +175,12 @@ Route.prototype._navigateToParams = function _navigateToParams() {
   if (!parts) return;
   this.driver.navigateToParts(parts);
 };
+
+function countParams(compiled) {
+  return compiled.reduce(function(count, part) {
+    return count + (part.type === 'param' ? 1 : 0);
+  }, 0);
+}
 
 })(window);
 </script>
