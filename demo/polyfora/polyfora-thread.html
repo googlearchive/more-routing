@@ -1,9 +1,13 @@
 <link rel="import" href="../../../polymer/polymer.html">
 
+<link rel="import" href="../../more-route.html">
+
 <link rel="import" href="polyfora-user-ref.html">
 
-<polymer-element name="polyfora-thread" attributes="thread">
+<polymer-element name="polyfora-thread" attributes="data">
   <template>
+    <more-route context name="thread" params="{{params}}"></more-route>
+
     <style>
       :host {
         display: block;
@@ -47,9 +51,16 @@
   </template>
   <script>
     Polymer('polyfora-thread', {
+      observe: {
+        'params.forumId':  'threadChanged',
+        'params.threadId': 'threadChanged',
+      },
+
       threadChanged: function() {
         // We freeze the displayed thread so that transitions aren't wonky.
-        if (this.thread) this._thread = this.thread;
+        if (!this.params.forumId || !this.params.threadId) return;
+        this._forum  = this.data.forumsById[this.params.forumId];
+        this._thread = this._forum && this._forum.threadsById[this.params.threadId];
       },
     });
   </script>

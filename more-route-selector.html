@@ -79,11 +79,17 @@ TODO(nevir): Support child addition/removal/reorder.
        */
 
       /** @override */
-      routingReady: function() {
-        this._managedSelector   = this._findChildSelector();
-        this.$.selection.routes = this._routesFromChildren();
-        // Give the managed selector time to spin up.
-        this.async(this._observeManagedSelector);
+      domReady: function() {
+        this.super();
+        // Rather than performing this setup in `routingReady`, we defer until
+        // domReady so that our children have a chance to set up.
+        this._managedSelector = this._findChildSelector();
+        // `routingReady` fires top-down; we need to let them do their thing
+        // before we walk them.
+        this.async(function() {
+          this.$.selection.routes = this._routesFromChildren();
+          this._observeManagedSelector();
+        });
       },
 
       selectedIndexChanged: function() {
@@ -119,19 +125,27 @@ TODO(nevir): Support child addition/removal/reorder.
         var context = this._managedSelector || this;
         var routes = [];
         for (var i = 0, child; child = context.children[i]; i++) {
-          if (!child.hasAttribute(this.routeAttribute)) {
-            console.warn('Child of', this, 'is missing route attribute "' + this.routeAttribute + '":', child);
-            continue;
-          }
-          var expression = child.getAttribute(this.routeAttribute);
-          var route      = MoreRouting.getRoute(expression, this.parentRoute);
-          // Associate the route w/ its element while we're here.
-          child.moreRouteContext = route;
-
-          routes.push(route);
+          routes.push(this._routeForChild(child));
         }
 
         return routes;
+      },
+
+      _routeForChild: function(child) {
+        if (child.moreRouteContext && child.moreRouteContext instanceof MoreRouting.Route) {
+          return child.moreRouteContext;
+        }
+
+        if (!child.hasAttribute(this.routeAttribute)) {
+          console.warn('Child of', this, 'is missing route attribute "' + this.routeAttribute + '":', child);
+          return null;
+        }
+        var expression = child.getAttribute(this.routeAttribute);
+        var route      = MoreRouting.getRoute(expression, this.parentRoute);
+        // Associate the route w/ its element while we're here.
+        child.moreRouteContext = route;
+
+        return route;
       },
 
     });

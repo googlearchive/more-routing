@@ -2,10 +2,14 @@
 <link rel="import" href="../../../paper-ripple/paper-ripple.html">
 <link rel="import" href="../../../paper-shadow/paper-shadow.html">
 
+<link rel="import" href="../../more-route.html">
+
 <link rel="import" href="polyfora-user-ref.html">
 
-<polymer-element name="polyfora-forum" attributes="forum">
+<polymer-element name="polyfora-forum" attributes="data">
   <template>
+    <more-route context name="forum" params="{{params}}"></more-route>
+
     <style>
       :host {
         display: block;
@@ -63,16 +67,21 @@
   </template>
   <script>
     Polymer('polyfora-forum', {
-      forumChanged: function() {
+      observe: {
+        'params.forumId': 'forumIdChanged',
+      },
+
+      forumIdChanged: function() {
         // We freeze the displayed forum so that transitions aren't wonky.
-        if (this.forum) this._forum = this.forum;
+        if (!this.params.forumId) return;
+        this._forum = this.data.forumsById[this.params.forumId];
       },
 
       _onThreadTapped: function(event, detail, target) {
         var thread = target.templateInstance.model.thread;
         // In addition to routing via a `more-route` element, more-routing's
         // JavaScript API also exposes helpers:
-        MoreRouting.navigateTo('thread', {forumId: this.forum.id, threadId: thread.id});
+        MoreRouting.navigateTo('thread', {forumId: this._forum.id, threadId: thread.id});
         event.stopPropagation();
 
         target.querySelector('.author').makeHero();
