@@ -162,7 +162,6 @@ Elements can declare a route to be associated with, which allows
 `<more-route-selector>` to be smart and use that as the route it checks against
 for your element. For example:
 
-`routed-element.html`:
 ```html
 <polymer-element name="routed-element">
   <template>
