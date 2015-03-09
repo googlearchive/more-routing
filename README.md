@@ -1,87 +1,67 @@
 Routing
 =======
 
-A composable suite of objects and elements to make routing with web components 
+A composable suite of objects and elements to make routing with web components
 a breeze.
 
-* [Hash-](#MoreRouting.HashDriver) and [path-](#MoreRouting.PathDriver)based 
+* [Hash-](#MoreRouting.HashDriver) and [path-](#MoreRouting.PathDriver)based
   routing.
 * [Named routes](#more-routing).
 * [Nested (mounted) routes](#more-route--nesting).
 * [Declarative route switching](#more-route-switch).
 * [Polymer helpers](#polymer-helpers--filters) for easy integration into existing elements.
 
-TL;DR via [`more-route-selector`](#more-route-selector):
+TL;DR:
 
 ```html
+<link rel="import" href="../more-routing/more-routing.html">
+
 <more-routing-config driver="path"></more-routing-config>
 <more-route name="user" path="/users/:userId">
   <more-route name="user-bio" path="/bio"></more-route>
 </more-route>
 
-<more-route-selector routes="['user', '/about', '/']" selectedIndex="{{pageIndex}}" selectedParams="{{params}}"></more-route-selector>
-<core-pages selected="{{pageIndex}}">
+<more-route-selector selectedParams="{{params}}">
+  <core-pages>
+    <section route="/">
+      This is the index.
+    </section>
 
-  <div>
-    <header>User {{params.userId}}</header>
-    <template if="{{ route('user-bio').active }}">
-      All the details about {{params.userId}} that you didn't want to know...
-    </template>
-  </div>
+    <section route="/about">
+      It's a routing demo!
+      <a href="{{ urlFor('user-bio', {userId: 1}) }}">Read about user 1</a>.
+    </section>
 
-  <div>
-    It's a routing demo!
-    <a href="{{ urlFor('user-bio', {userId: 1}) }}">Read about user 1</a>.
-  </div>
-
-  <div>
-    The index.
-  </div>
-
-</core-pages>
+    <section route="user">
+      <header>Heyo user {{params.userId}}!</header>
+      <template if="{{ route('user-bio').active }}">
+        All the details about {{params.userId}} that you didn't want to know...
+      </template>
+    </section>
+  </core-pages>
+</more-route-selector>
 ```
 
-TL;DR via [`more-route-switch`](#more-route-switch):
+[Rob Dodson](https://github.com/robdodson) has also whipped up a great video
+that can get you started with more-routing:
 
-```html
-<more-routing-config driver="path"></more-routing-config>
-<more-route name="user" path="/users/:userId">
-  <more-route name="user-bio" path="/bio"></more-route>
-</more-route>
+[![Moar routing with... more-routing](http://img.youtube.com/vi/-67kb7poIT8/0.jpg)](https://www.youtube.com/watch?v=-67kb7poIT8)
 
-<more-route-switch>
-
-  <template when-route="user">
-    <header>User {{params.userId}}</header>
-    <template if="{{ route('user-bio').active }}">
-      All the details about {{params.userId}} that you didn't want to know...
-    </template>
-  </template>
-
-  <template when-route="/about">
-    It's a routing demo!
-    <a href="{{ urlFor('user-bio', {userId: 1}) }}">Read about user 1</a>.
-  </template>
-
-  <template else>
-    The index.
-  </template>
-
-</more-route-switch>
-```
+And finally, check out [the demo](demo/) for a project that makes comprehensive
+use of the various features in more-routing.
 
 
 Element API
 ===========
 
-<a name="more-routing"></a>
+<a name="more-routing-config"></a>
 `<more-routing-config>`
 ----------------
 
-_Defined in [`more-routing.html`](more-routing.html)._
+_Defined in [`more-routing-config.html`](more-routing-config.html)._
 
 The declarative interface for configuring [`MoreRouting`](#MoreRouting).
-Currently, this lets you declare which [driver](#MoreRouting.Driver) you wish 
+Currently, this lets you declare which [driver](#MoreRouting.Driver) you wish
 to use (`hash` or `path`):
 
 ```html
@@ -130,9 +110,9 @@ Routes can also be nested:
 
 In this example, the route named `user-bio` will match `/users/:userId/bio`.
 
-_Nesting isn't restricted to `<more-route>` elements! See
-[`<more-route-switch>`'s `routeContext` attribute](more-route-switch--nesting) 
-for an example of nesting within your live DOM._
+Finally, `<more-route>` elements can declare a routing context for the element
+that contains them by setting the `context` attribute. See the
+[routed elements](#more-route-selector--routed-elements) section for more info.
 
 
 <a name="more-route-selector"></a>
@@ -141,87 +121,87 @@ for an example of nesting within your live DOM._
 
 _Defined in [`more-route-selector.html`](more-route-selector.html)._
 
-Given a list of routes to evaluate, `more-route-selector` chooses the **first**
-active route from that list.
+Manages a [`<core-selector>`](https://www.polymer-project.org/docs/elements/core-elements.html#core-selector)
+(or anything that extends it/looks like one), where each item in the selector
+have an associated route. The most specific route that is active will be
+selected.
 
 ```html
-<more-route-selector
-  routes="['user', '/about', '/']"
-  selectedIndex="{{index}}"
-  selectedParams="{{params}}">
+<more-route-selector>
+  <core-pages>
+    <section route="/">The index!</section>
+    <section route="user">A user (named route)</section>
+    <section route="/about">Another route</section>
+  </core-pages>
 </more-route-selector>
 ```
 
+By default, `more-route-selector` will look for the `route` attribute on any
+children of the `core-selector` (change this via `routeAttribute`).
+
 It exposes information about the selected route via a few properties:
-
-`selectedIndex`: The index of the selected route (relative to `routes`).
-
-`selectedPath`: The path expression of the selected route.
 
 `selectedParams`: The params of the selected route.
 
+`selectedRoute`: The [`MoreRouting.Route`](#MoreRouting.Route) representing the
+selected route.
 
-<a name="more-route-switch"></a>
-`<more-route-switch>`
----------------------
+`selectedPath`: The path expression of the selected route.
 
-_Defined in [`more-route-switch.html`](more-route-switch.html)._
+`selectedIndex`: The index of the selected route (relative to `routes`).
 
-A simple way of declaring a set of mutually exclusive routes, and the elements
-that should be displayed when each is active. Built on top of
-[`more-switch`](https://github.com/Polymore/more-switch).
 
+<a name="more-route-selector--routed-elements"></a>
+### Routed Elements
+
+Elements can declare a route to be associated with, which allows
+`<more-route-selector>` to be smart and use that as the route it checks against
+for your element. For example:
+
+`routed-element.html`:
 ```html
-<more-route-switch>
-
-  <template when-route="user">
-    <header>User {{params.userId}}</header>
-    <template if="{{ route('user-bio').active }}">
-      All the details about {{params.userId}} that you didn't want to know...
-    </template>
+<polymer-element name="routed-element">
+  <template>
+    <more-route path="/my/route" context></more-route>
+    I'm a routed element!
   </template>
-
-  <template when-route="/about">
-    It's a routing demo!
-    <a href="{{ urlFor('user-bio', {userId: 1}) }}">Read about user 1</a>.
-  </template>
-
-  <template else>
-    The index.
-  </template>
-
-</more-route-switch>
+</polymer-element>
 ```
 
-`when-route` attributes can either be a named route, or a path, and you may use
-`else` as a fallback (it is shorthand for `when-route="/"`.
+```html
+<more-route-selector>
+  <core-pages>
+    <section route="/">The index!</section>
+    <routed-element></routed-element>
+  </core-pages>
+</more-route-selector>
+```
 
-Note that the route's params are injected into a `params` value in the
-template's context. You can specify the name for this via `paramsProperty` on
-the `more-route-switch`.
+In this example, The `<more-route-selector>` will choose `<routed-element>`
+whenever the path begins with `/my/route`. Keep it DRY!
 
 
-<a name="more-route-switch--nesting"></a>
+<a name="more-route-selector--nesting-contexts"></a>
 ### Nesting Contexts
 
-Similar to [`more-route`'s nesting behavior](#more-route--nesting), you can
-declare a `more-route-switch` to be a nesting context for any routes defined
-within its children.
+Similar to [`more-route`'s nesting behavior](#more-route--nesting), any items in
+the core-selector also behave as nesting contexts. Any route declared within a
+routing context is effectively _mounted_ on the context route.
+
+Taking the example element, `<routed-element>` above; if we were to add the
+following to its template:
 
 ```html
-<more-route-switch routeContext>
-
-  <template when-route="/users/:userId">
-    <!-- The full path for this would be /users/:userId/posts. -->
-    <more-route path="/posts"></more-route>
-
-  </template>
-
-</more-route-switch>
+<more-route path="/:tab" params="{{params}}"></more-route>
 ```
 
-This is very handy for creating "mount points" within your elements. Also, 
-note that you can use named routes to break out of a nesting context.
+That route's full path would be `/my/route/:tab`, because `/my/route` is the
+context in which it is nested. This allows you to create custom elements that
+make use of routes, _while not requiring knowledge of the app's route
+hierarchy_. Very handy for composable components!
+
+**Note:** All items in a `<more-route-selector>` are treated as routing
+contexts!
 
 
 <a name="polymer-helpers"></a>
@@ -244,20 +224,15 @@ reading params, etc on the fly.
 <x-user model="{{ route('user').params }}"></x-user>
 ```
 
+**Note:** The `route()` helper is unfortunately _not_ aware of the current
+routing context. Consider using only named routes to avoid confusion!
+
 #### `urlFor`
 
 Generates a URL for the specified route and params:
 
 ```html
 <a href="{{ urlFor('user', {userId: 1}) }}">User 1</a>
-```
-
-#### `isCurrentUrl`
-
-Determines whether a given route _and params_ match the current URL:
-
-```html
-<a href="/users/1" active?="{{ isCurrentUrl('user', {userId: 1}) }}">User 1</a>
 ```
 
 
@@ -270,18 +245,18 @@ JavaScript API
 
 _Defined in [`routing.html`](routing.html)._
 
-The main entry point into `more-routing`, exposed as a global JavaScript 
+The main entry point into `more-routing`, exposed as a global JavaScript
 namespace of `MoreRouting`. For the most part, all elements and helpers are
 built on top of it.
 
-`MoreRouting` manages the current [driver](#MoreRouting.Driver), and maintains 
+`MoreRouting` manages the current [driver](#MoreRouting.Driver), and maintains
 an identity map of all routes.
 
 
 <a name="MoreRouting.driver"></a>
 ### `MoreRouting.driver`
 
-Before you can make use of navigation and URL parsing, a driver must be 
+Before you can make use of navigation and URL parsing, a driver must be
 registered. Simply assign an instance of `MoreRouting.Driver` to this property.
 
 This is exposed as a declarative element via
