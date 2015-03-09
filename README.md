@@ -45,9 +45,11 @@ TL;DR:
 [Rob Dodson](https://github.com/robdodson) has also whipped up a great video
 that can get you started with more-routing:
 
-<center>
-[![Moar routing with... more-routing](http://img.youtube.com/vi/-67kb7poIT8/0.jpg)](https://www.youtube.com/watch?v=-67kb7poIT8)
-</center>
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=-67kb7poIT8">
+    <img src="http://img.youtube.com/vi/-67kb7poIT8/0.jpg" alt="Moar routing with... more-routing">
+  </a>
+</p>
 
 And finally, check out [the demo](demo/) for a project that makes comprehensive
 use of the various features in more-routing.
