@@ -11,7 +11,16 @@ a breeze.
 * [Declarative route switching](#more-route-switch).
 * [Polymer helpers](#polymer-helpers--filters) for easy integration into existing elements.
 
-TL;DR:
+[Rob Dodson](https://github.com/robdodson) has whipped up a great video
+that can get you started with more-routing:
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=-67kb7poIT8">
+    <img src="http://img.youtube.com/vi/-67kb7poIT8/0.jpg" alt="Moar routing with... more-routing">
+  </a>
+</p>
+
+Or, TL;DR:
 
 ```html
 <link rel="import" href="../more-routing/more-routing.html">
@@ -41,15 +50,6 @@ TL;DR:
   </core-pages>
 </more-route-selector>
 ```
-
-[Rob Dodson](https://github.com/robdodson) has also whipped up a great video
-that can get you started with more-routing:
-
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=-67kb7poIT8">
-    <img src="http://img.youtube.com/vi/-67kb7poIT8/0.jpg" alt="Moar routing with... more-routing">
-  </a>
-</p>
 
 And finally, check out [the demo](demo/) for a project that makes comprehensive
 use of the various features in more-routing.
