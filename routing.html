@@ -119,7 +119,8 @@ Object.defineProperty(MoreRouting, 'driver', {
   },
   set: function setDriver(newDriver) {
     if (driver) {
-      throw new Error('Changing routing drivers is not supported');
+      console.warn('Changing routing drivers is not supported, ignoring. You should have only one <more-routing-config> on the page!');
+      return;
     }
     driver = newDriver;
   }
