@@ -1,77 +1,61 @@
 <!doctype html>
 <html>
-<head>
-  <title>more-routing</title>
+  <head>
+    <meta charset="utf-8">
+    <script src="../../../webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="../../core-animated-pages/core-animated-pages.html">
+    <link rel="import" href="../../font-roboto/roboto.html">
+    <link rel="import" href="../../paper-tabs/paper-tabs.html">
+    <link rel="import" href="../more-route-selector.html">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="global.css">
 
-  <script src="../../webcomponentsjs/webcomponents.js"></script>
-  <link rel="import" href="../../core-scaffold/core-scaffold.html">
-  <link rel="import" href="../../more-param/more-param.html">
+    <!--
+    `routes.html` configures more-routing, and specifies all of the named routes
+    for this application. Take a look at it.
+    -->
+    <link rel="import" href="routes.html">
+    <link rel="import" href="polyfora-data.html">
+    <link rel="import" href="polyfora-forum-index.html">
+    <link rel="import" href="polyfora-forum.html">
+    <link rel="import" href="polyfora-thread.html">
+    <link rel="import" href="polyfora-user.html">
+  </head>
+  <body>
+    <template is="auto-binding">
+      <polyfora-data data="{{data}}"></polyfora-data>
 
-  <link rel="import" href="../more-route-item.html">
-  <link rel="import" href="../more-route-switch.html">
-  <link rel="import" href="../more-route.html">
-  <link rel="import" href="../more-routing.html">
+      <!--
+      more-routing exposes a `urlFor` helper that will construct a URL for a
+      particular route (and params).
+      -->
+      <a href="{{urlFor('root')}}" class="header" paper-font-style="display-2">Polyfora</a>
 
-  <style>
-    more-route-item {
-      display: block;
-      padding: 0.5em;
-    }
-    more-route-item[current] {
-      background: #9C5299;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-  <template is="auto-binding">
-    <more-param key="driver" value="{{driver}}" default="hash"></more-param>
+      <div class="content" paper-font-style="body-1">
+        <!--
+        `more-route-selector` manages any element that extends `core-selector`,
+        allowing you to associate each with a route. By default, it looks for
+        the `route` attribute on each item in the `core-selector`. You can see
+        an example of that default behavior in `polyfora-user.html`.
 
-    <more-routing-config driver="{{driver}}"></more-routing-config>
-    <more-route name="user" path="/users/:userId">
-      <more-route name="user-bio" path="/bio"></more-route>
-    </more-route>
+        In this example, we have opted to construct our base pages such that
+        they declare _routing contexts_. Each element declares the route that it
+        represents, and `more-route-selector` uses this to select the correct
+        route to display.
 
-    <core-scaffold>
+        See each page's `<more-route context ...>`.
+        -->
+        <more-route-selector selectedParams="{{params}}">
+          <core-animated-pages transitions="hero-transition cross-fade">
+            <polyfora-forum-index data="{{data}}"></polyfora-forum-index>
+            <polyfora-user        data="{{data}}"></polyfora-user>
+            <polyfora-forum       data="{{data}}"></polyfora-forum>
+            <polyfora-thread      data="{{data}}"></polyfora-thread>
+          </core-animated-pages>
+        </more-route-selector>
 
-      <header tool>more-routing</header>
+      </div>
 
-      <nav>
-        <more-route-item path="/">Index</more-route-item>
-        <more-route-item path="/about">About</more-route-item>
-        <more-route-item name="user"     params="{{ {userId: 1} }}">User 1</more-route-item>
-        <more-route-item name="user-bio" params="{{ {userId: 1} }}">User 1's bio</more-route-item>
-        <more-route-item name="user"     params="{{ {userId: 2} }}">User 2</more-route-item>
-        <more-route-item name="user-bio" params="{{ {userId: 2} }}">User 2's bio</more-route-item>
-      </nav>
-
-      <section id="content">
-        <more-route-switch>
-
-          <template when-route="user">
-            <header>User {{params.userId}}</header>
-            <template if="{{ route('user-bio').active }}">
-              All the details about {{params.userId}} that you didn't want to know...
-            </template>
-          </template>
-
-          <template when-route="/about">
-            It's a routing demo!
-            <a href="{{ urlFor('user-bio', {userId: 1}) }}">Read about user 1</a>.
-          </template>
-
-          <template else>
-            The index.
-          </template>
-
-        </more-route-switch>
-      </section>
-    </core-scaffold>
-
-  </template>
-</body>
+    </template>
+  </body>
 </html>
