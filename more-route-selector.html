@@ -124,9 +124,25 @@ TODO(nevir): Support child addition/removal/reorder.
         // If we aren't managing a `core-selector`, just use our own children.
         var context = this._managedSelector || this;
         var routes = [];
-        for (var i = 0, child; child = context.children[i]; i++) {
-          routes.push(this._routeForChild(child));
-        }
+
+        var findChildren = function(children) {
+          for (var i = 0, child; child = children[i]; i++) {
+            var lowerNodeName = child.nodeName.toLowerCase();
+
+            if (lowerNodeName !== 'content') {
+              routes.push(this._routeForChild(child));
+            } else {
+              // getDistributedNodes() only give correct result if a 'select' attribute exists on the content
+              if (child.hasAttribute('select')) {
+                findChildren(child.getDistributedNodes());
+              } else {
+                console.warn('Child content', child, 'is missing the "select" attribute and will not be used.');
+              }
+            }
+          }
+        }.bind(this);
+
+        findChildren(context.children);
 
         return routes;
       },
