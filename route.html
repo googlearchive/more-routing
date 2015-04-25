@@ -1,3 +1,5 @@
+<link rel="import" href="../observe-js/observe-js.html">
+
 <script>
 (function(scope) {
 var MoreRouting = scope.MoreRouting = scope.MoreRouting || {};
@@ -21,15 +23,13 @@ function Route(path, parent) {
   this.active   = false;
   this.driver   = null;
 
-  this.parts = [];
+  this.parts    = [];
   this.children = [];
 
-  /**
-   * Param values matching the current URL, or an empty object if not `active`.
-   *
-   * To make data "binding" easy, `Route` guarantees that `params` will always
-   * be the same object; just make a reference to it.
-   */
+  // Param values matching the current URL, or an empty object if not `active`.
+  //
+  // To make data "binding" easy, `Route` guarantees that `params` will always
+  // be the same object; just make a reference to it.
   if (this.parent) {
     this.params = Object.create(this.parent.params);
     this.parent.children.push(this);
@@ -93,7 +93,7 @@ Route.prototype.partsForParams = function partsForParams(params, silent) {
       if (params && config.name in params) {
         value = params[config.name];
       } else {
-        value = this.params[config.name] || this.params.prototype[config.name];
+        value = this.params[config.name];
       }
       if (value === undefined) {
         if (silent) {

@@ -1,79 +1,54 @@
 <link rel="import" href="../polymer/polymer.html">
+
 <link rel="import" href="route.html">
+<link rel="import" href="routing.html">
 
-<!--
-TODO(nevir): Document.
--->
-<polymer-element name="more-route-context-aware">
-  <script>
-    Polymer('more-route-context-aware', {
+<script>
 
-      /** @override */
-      ready: function() {
-        // We're being stamped by a template; we need to defer until the
-        // template instance has been appended to the document.
-        if (!this.parentElement && !this.host && this.templateInstance) return;
-        this._routeContextAwareReady();
-      },
+  MoreRouting.ContextAware = {
 
-      /** @override */
-      domReady: function() {
-        this._routeContextAwareReady();
-      },
+    /** @override */
+    ready: function() {
+      this._makeRoutingReady();
+    },
 
-      /**
-       * Extension point for subclasses. They can assume that the element has
-       * been initialized by this point.
-       *
-       * If your element is to become a route context, it must define that route
-       * **synchronously** within this callback!
-       */
-      routingReady: function() {},
+    /**
+     * Calls `routingReady`, and ensures that it is called in a top-down manner.
+     *
+     * We need to be sure that parent nodes have `routingReady` triggered before
+     * their children so that they can properly configure nested routes.
+     *
+     * Unfortunately, `ready` is sometimes bottom-up, sometimes top-down.
+     * Ideally, this wouldn't be necessary.
+     *
+     * @see https://github.com/Polymer/polymer/pull/1448
+     */
+    _makeRoutingReady: function() {
+      if (this.routingIsReady) return;
 
-      _routeContextAwareReady: function() {
-        if (this.routingIsReady) return;
-        this.routingIsReady = true;
-        this._awakenRouteContextAwareAncestors();
-        this.parentRoute = this._findParentRoute();
-        this.routingReady();
-      },
-
-      /**
-       * Annoyingly, `ready` doesn't appear to fire in a consistent manner
-       * between the elements that extend this. We want top-down loading of our
-       * elements so that parents can be properly built and resolved.
-       */
-      _awakenRouteContextAwareAncestors: function() {
-        var ancestors = this._findRouteContextAwareAncestors();
-        for (var i = 0, ancestor; ancestor = ancestors[i]; i++) {
-          ancestor._routeContextAwareReady();
-        }
-      },
-
-      _findParentRoute: function() {
-        var node = this;
-        while (node) {
-          node = node.parentNode || node.host;
-          var route = node && (node.moreRouteContext || node.route);
-          if (route instanceof MoreRouting.Route) {
-            return route;
-          }
-        }
-        return null;
-      },
-
-      _findRouteContextAwareAncestors: function() {
-        var node = this;
-        var ancestors = [];
-        while (node) {
-          node = node.parentNode || node.host;
-          if (node && node._routeContextAwareReady) {
-            ancestors.push(node);
-          }
-        }
-        return ancestors;
+      var node = this;
+      while (node = Polymer.dom(node).parentNode) {
+        if (typeof node._makeRoutingReady === 'function') break;
       }
+      if (node) node._makeRoutingReady();
 
-    });
-  </script>
-</polymer-element>
+      this.parentRoute = this._findParentRoute();
+      this.routingIsReady = true;
+      if (typeof this.routingReady === 'function') this.routingReady();
+    },
+
+    _findParentRoute: function() {
+      var node = this;
+      while (node) {
+        node = Polymer.dom(node).parentNode;
+        var route = node && node.moreRouteContext;
+        if (route instanceof MoreRouting.Route) {
+          return route;
+        }
+      }
+      return null;
+    },
+
+  };
+
+</script>
