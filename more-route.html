@@ -1,187 +1,180 @@
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
+The complete set of authors may be found at http://polymer.github.io/AUTHORS
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS
+-->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../observe-js/observe-js.html">
 
 <link rel="import" href="routing.html">
 <link rel="import" href="more-route-context-aware.html">
 
-<!--
-TODO(nevir): Document.
+<script>
 
--->
-<polymer-element name="more-route" extends="more-route-context-aware">
-  <script>
-    Polymer('more-route', {
-      publish: {
-        /**
-         * The name of this route. Behavior differs based on the presence of
-         * `path` during _declaration_.
-         *
-         * If `path` is present during declaration, it is registered via `name`.
-         *
-         * Otherwise, this `more-route` becomes a `reference` to the route with
-         * `name`. Changing `name` will update which route is referenced.
-         *
-         * @attribute name
-         * @type String
-         */
-        name: '',
+  Polymer({
 
-        /**
-         * A path expression used to parse parameters from the window's URL.
-         *
-         * @attribute path
-         * @type String
-         */
-        path: '',
+    is: 'more-route',
 
-        /**
-         * Whether this route should become a context for the element that
-         * contains it.
-         *
-         * @attribute context
-         * @type Boolean
-         * @default false
-         */
-        context: false,
+    behaviors: [
+      MoreRouting.ContextAware,
+    ],
 
-        /**
-         * The full path expression for this route, including routes this is
-         * nested within.
-         *
-         * @attribute fullPath
-         * @type String
-         * @readonly
-         */
-        fullPath: '',
+    properties: {
 
-        /**
-         * Whether this route is a reference to a named route.
-         *
-         * @attribute reference
-         * @type Boolean
-         */
-        reference: false,
-
-        /**
-         * Param values matching the current URL, or an empty object if not
-         * `active`.
-         *
-         * @attribute params
-         * @type Object
-         */
-        params: {},
-
-        /**
-         * Whether the route matches the current URL.
-         *
-         * @attribute active
-         * @type Boolean
-         * @readonly
-         */
-        active: false,
-
-        /**
-         * The underlying `MoreRouting.Route` object that is being wrapped.
-         *
-         * @attribute route
-         * @type MoreRouting.Route
-         * @readonly
-         */
-        route: null,
-
-        /**
-         * The parent `more-route` element, if it is nested within another.
-         *
-         * Parents are found by searching up this element's ancestry for nodes
-         * that are `more-route` elements, or have a `moreRouteContext`
-         * property.
-         *
-         * @attribute parent
-         * @type <more-route>
-         * @readonly
-         */
-        parent: null,
+      /**
+       * The name of this route. Behavior differs based on the presence of
+       * `path` during _declaration_.
+       *
+       * If `path` is present during declaration, it is registered via `name`.
+       *
+       * Otherwise, this `more-route` becomes a `reference` to the route with
+       * `name`. Changing `name` will update which route is referenced.
+       */
+      name: {
+        type:     String,
+        observer: '_nameChanged',
       },
 
-      observe: {
-        'name':      '_identityChanged',
-        'path':      '_identityChanged',
-        'reference': '_identityChanged',
-        // TODO(nevir): Truly read-only properties would be super handy.
-        'active':    '_updateProxiedValues',
+      /**
+       * A path expression used to parse parameters from the window's URL.
+       */
+      path: {
+        type:     String,
+        observer: '_pathChanged',
       },
 
-      /** @override */
-      routingReady: function() {
-        this.reference = this.name && !this.path;
-        this._identityChangedCallCount = 0;
-        this._identityChanged();
+      /**
+       * Whether this route should become a context for the element that
+       * contains it.
+       */
+      context: {
+        type: Boolean,
       },
 
-      urlFor: function(params) {
-        return this.route.urlFor(params);
+      /**
+       * The underlying `MoreRouting.Route` object that is being wrapped.
+       *
+       * @type {MoreRouting.Route}
+       */
+      route: {
+        type:     Object,
+        readOnly: true,
+        notify:   true,
+        observer: '_routeChanged',
       },
 
-      navigateTo: function(params) {
-        return this.route.navigateTo(params);
+      /**
+       * The full path expression for this route, including routes this is
+       * nested within.
+       */
+      fullPath: {
+        type:     String,
+        readOnly: true,
+        notify:   true,
       },
 
-      isCurrentUrl: function(params) {
-        return this.route.isCurrentUrl(params);
+      /**
+       * Param values matching the current URL, or an empty object if not
+       * `active`.
+       */
+      params: {
+        type:     Object,
+        readOnly: true,
+        notify:   true,
       },
 
-      _identityChanged: function() {
-        if (!this.routingIsReady) return;
+      /**
+       * Whether the route matches the current URL.
+       */
+      active: {
+        type:     Boolean,
+        readOnly: true,
+        notify:   true,
+      },
 
-        this._identityChangedCallCount = this._identityChangedCallCount + 1;
-        if (this._identityChangedCallCount === 2) return;
+    },
 
-        if (this.name && this.reference) {
-          this.route = MoreRouting.getRouteByName(this.name);
-        } else if (this.path && this.name) {
-          this.route = MoreRouting.registerNamedRoute(this.name, this.path, this.parentRoute);
-        } else if (this.path) {
-          this.route = MoreRouting.getRouteByPath(this.path, this.parentRoute);
-        } else {
-          this.route = null;
+    routingReady: function() {
+      this._identityChanged();
+    },
+
+    _nameChanged: function(newName, oldName) {
+      if (oldName) {
+        console.error('Changing the `name` property is not supported for', this);
+        return;
+      }
+      this._identityChanged();
+    },
+
+    _pathChanged: function(newPath, oldPath) {
+      if (oldPath) {
+        console.error('Changing the `path` property is not supported for', this);
+        return;
+      }
+      this._identityChanged();
+    },
+
+    _identityChanged: function() {
+      if (!this.routingIsReady) return;
+
+      if (this.name && this.path) {
+        this._setRoute(MoreRouting.registerNamedRoute(this.name, this.path, this.parentRoute));
+      } else if (this.name) {
+        this._setRoute(MoreRouting.getRouteByName(this.name));
+      } else if (this.path) {
+        this._setRoute(MoreRouting.getRouteByPath(this.path, this.parentRoute));
+      } else {
+        this._setRoute(null);
+      }
+    },
+
+    _routeChanged: function() {
+      this._setFullPath(this.route.fullPath);
+      this._setParams(this.route.params);
+      this._setActive(this.route.active);
+
+      // @see MoreRouting.ContextAware
+      this.moreRouteContext = this.route;
+
+      if (this.context) {
+        var parent = Polymer.dom(this).parentNode;
+        if (parent.nodeType !== Node.ELEMENT_NODE) {
+          parent = parent.host;
         }
 
-        if (this._routeObserver) this._routeObserver.close();
-        if (this.route) {
-          this.params   = this.route.params;
-          this.path     = this.route.path;
-          this.fullPath = this.route.fullPath;
-          this._observeRoute(this.route);
-        } else {
-          this.params   = {};
-          this.path     = '';
-          this.fullPath = '';
-        }
-
-        if (this.hasAttribute('context')) {
-          var parent = this.parentElement || this.parentNode && this.parentNode.host;
-          if (!parent) {
-            console.warn(this, 'wants to create a routing context, but it has no parent');
-            return;
-          }
+        if (parent.nodeType === Node.ELEMENT_NODE) {
           parent.moreRouteContext = this.route;
+        } else {
+          console.warn('Unable to determine parent element for', this, '- not setting a context');
         }
-      },
+      }
+    },
 
-      _updateProxiedValues: function() {
-        var previousActive = this.active;
-        this.active = this.route && this.route.active;
+    _observeRoute: function(route) {
+      // TODO(nevir) https://github.com/Polymore/more-routing/issues/24
+      if (this._routeObserver) this._routeObserver.close();
+      this._routeObserver = new CompoundObserver();
+      this._routeObserver.addPath(route, 'active');
+      this._routeObserver.open(function() {
+        this._setActive(route.active);
+      }.bind(this));
+    },
 
-        if (this.active === previousActive) return;
-        var eventName = 'more-route-' + (this.active ? 'active' : 'inactive');
-        this.fire(eventName, this.route);
-      },
+    urlFor: function(params) {
+      return this.route.urlFor(params);
+    },
 
-      _observeRoute: function(route) {
-        this._routeObserver = new CompoundObserver();
-        this._routeObserver.addPath(route, 'active');
-        this._routeObserver.open(this._updateProxiedValues.bind(this));
-      },
+    navigateTo: function(params) {
+      return this.route.navigateTo(params);
+    },
 
-    });
-  </script>
-</polymer-element>
+    isCurrentUrl: function(params) {
+      return this.route.isCurrentUrl(params);
+    },
+
+  });
+
+</script>

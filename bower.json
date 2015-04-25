@@ -1,21 +1,34 @@
 {
-  "private": true,
   "name": "more-routing",
+  "version": "0.8.0",
+  "authors": [
+    "Ian MacLeod <ian@nevir.net>",
+    "The Polymer Authors"
+  ],
+  "description": "A composable suite of objects and elements to make routing with web components a breeze.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "routing",
+    "router"
+  ],
+  "main": "more-routing.html",
+  "license": "MIT",
+  "homepage": "https://github.com/PolymerLabs/more-routing/",
+  "ignore": [
+    "/.*",
+    "/tests/",
+    "/demo/"
+  ],
   "dependencies": {
-    "core-item": "Polymer/core-item#^0.5.0",
-    "more-switch": "Polymore/more-switch",
-    "polymer": "Polymer/polymer#^0.5.0"
+    "polymer": "Polymer/polymer#v0.8.0-rc.7",
+    "observe-js": "Polymer/observe-js#0.5.6-rc1"
   },
   "devDependencies": {
-    "core-animated-pages": "Polymer/core-animated-pages#^0.5.0",
-    "core-pages": "Polymer/core-pages#^0.5.0",
-    "core-scaffold": "Polymer/core-scaffold#^0.5.0",
-    "font-roboto": "Polymer/font-roboto#^0.5.0",
-    "more-param": "Polymore/more-param",
-    "paper-ripple": "Polymer/paper-ripple#^0.5.0",
-    "paper-shadow": "Polymer/paper-shadow#^0.5.0",
-    "paper-tabs": "Polymer/paper-tabs#^0.5.0",
+    "iron-selector": "PolymerElements/iron-selector#^0.8.2",
+    "paper-styles": "PolymerElements/paper-styles#^0.8.3",
     "web-component-tester": "*",
-    "webcomponentsjs": "Polymer/webcomponentsjs"
+    "iron-doc-viewer": "PolymerElements/iron-doc-viewer#~0.8.5"
   }
 }
