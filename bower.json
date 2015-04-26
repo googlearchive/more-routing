@@ -26,9 +26,10 @@
     "observe-js": "Polymer/observe-js#0.5.6-rc1"
   },
   "devDependencies": {
+    "iron-doc-viewer": "PolymerElements/iron-doc-viewer#^0.8.5",
     "iron-selector": "PolymerElements/iron-selector#^0.8.2",
     "paper-styles": "PolymerElements/paper-styles#^0.8.3",
-    "web-component-tester": "*",
-    "iron-doc-viewer": "PolymerElements/iron-doc-viewer#~0.8.5"
+    "paper-styles": "PolymerElements/paper-styles#^0.8.6",
+    "web-component-tester": "*"
   }
 }

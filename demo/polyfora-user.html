@@ -1,35 +1,42 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-selector/iron-selector.html">
+<link rel="import" href="../../paper-styles/typography.html">
 
 <link rel="import" href="../more-route.html">
 <link rel="import" href="../more-route-selector.html">
 
-<polymer-element name="polyfora-user" attributes="data" noscript>
+<dom-module id="polyfora-user">
+
+  <style>
+
+    :host {
+      display: block;
+      padding: 16px;
+    }
+
+    header {
+      mixin(--paper-font-headline);
+    }
+
+    /* faux-tabs until we have paper-tabs */
+    iron-selector .tab {
+      mixin(--paper-font-body1);
+      display: inline-block;
+      padding: 8px;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    iron-selector .tab.iron-selected {
+      border-bottom-color: var(--theme-primary);
+    }
+
+  </style>
+
   <template>
     <more-route context name="user" params="{{params}}"></more-route>
 
-    <style>
-      :host {
-        display: block;
-        padding: 16px;
-        height: 100%;
-        box-sizing: border-box;
-      }
-
-      paper-tabs {
-        margin: 0 -16px;
-        border-bottom: 1px solid #ff4080;
-      }
-
-      paper-tabs::shadow #selectionBar {
-        background-color: #ff4080;
-      }
-
-      paper-tab::shadow #ink {
-        color: #ff4080;
-      }
-    </style>
-
-    <header paper-font-style="headline" hero-id="user/{{params.userId}}:name" hero>{{data.usersById[params.userId].name}}</header>
+    <header>{{_user.name}}</header>
 
     <!--
     If your more-route-selector contains routes without any params, it can also
@@ -37,11 +44,37 @@
     will be automatically updated to match the active tab.
     -->
     <more-route-selector>
-      <paper-tabs>
-        <paper-tab route="/threads">Threads</paper-tab>
-        <paper-tab route="/stats">Statistics</paper-tab>
-        <paper-tab route="/">Stuff</paper-tab>
-      </paper-tabs>
+      <iron-selector>
+        <span class="tab" route="/threads">Threads</span>
+        <span class="tab" route="/stats">Statistics</span>
+        <span class="tab" route="/">Stuff</span>
+      </iron-selector>
     </more-route-selector>
+
   </template>
-</polymer-element>
+
+  <script>
+
+    Polymer({
+
+      is: 'polyfora-user',
+
+      enableCustomStyleProperties: true,
+
+      properties: {
+        data: Object,
+      },
+
+      observers: [
+        '_userChanged(params.userId, data)',
+      ],
+
+      _userChanged: function() {
+        this._user = this.data && this.data.usersById[this.params.userId];
+      },
+
+    });
+
+  </script>
+
+</dom-module>
