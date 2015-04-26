@@ -43,7 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       path: {
         type:     String,
-        observer: '_pathChanged',
+        obserer: '_pathChanged',
       },
 
       /**
@@ -82,7 +82,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       params: {
         type:     Object,
-        readOnly: true,
+        // readOnly: true,
         notify:   true,
       },
 
@@ -132,8 +132,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     _routeChanged: function() {
+      this._observeRoute();
       this._setFullPath(this.route.fullPath);
-      this._setParams(this.route.params);
+      // this._setParams(this.route.params);
+      this.params = this.route.params;
       this._setActive(this.route.active);
 
       // @see MoreRouting.ContextAware
@@ -153,13 +155,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     },
 
-    _observeRoute: function(route) {
+    _observeRoute: function() {
       // TODO(nevir) https://github.com/Polymore/more-routing/issues/24
       if (this._routeObserver) this._routeObserver.close();
+      if (this._paramObserver) this._paramObserver.close();
+      if (!this.route) return;
+
       this._routeObserver = new CompoundObserver();
-      this._routeObserver.addPath(route, 'active');
+      this._routeObserver.addPath(this.route, 'active');
       this._routeObserver.open(function() {
-        this._setActive(route.active);
+        this._setActive(this.route.active);
+      }.bind(this));
+
+      this._paramObserver = new ObjectObserver(this.route.params);
+      this._paramObserver.open(function(added, removed, changed, getOldValue) {
+        var keys = Object.keys(added).concat(Object.keys(removed)).concat(Object.keys(changed));
+        keys.forEach(function(key) {
+          this.notifyPath('params.' + key, this.params[key]);
+        }.bind(this));
       }.bind(this));
     },
 

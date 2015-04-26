@@ -1,52 +1,48 @@
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../paper-ripple/paper-ripple.html">
+<link rel="import" href="../../paper-styles/typography.html">
 
-<polymer-element name="polyfora-user-ref" attributes="user hero" on-tap="{{_onTap}}">
+<dom-module id="polyfora-user-ref">
+
+  <style>
+
+    :host {
+      mixin(--paper-font-body2);
+      color:       var(--theme-primary);
+      display:     inline-block;
+      position:    relative;
+      cursor:      pointer;
+      white-space: nowrap;
+    }
+
+  </style>
+
   <template>
-    <style>
-      :host {
-        display:  inline-block;
-        position: relative;
-        cursor:   pointer;
-      }
-    </style>
-    <paper-ripple fit></paper-ripple>
-    <content></content>
+    <span class="name">{{user.name}}</span>
   </template>
+
   <script>
-    Polymer('polyfora-user-ref', {
-      userChanged: function() {
-        if (this.nameEl) {
-          this.nameEl.remove();
-        }
-        if (!this.user) return;
 
-        // Insert the user name into light DOM so that it can be plucked out by
-        // the hero transition of core-animated-pages.
-        this.nameEl = document.createElement('span');
-        this.nameEl.textContent = this.user.name;
-        this.nameEl.setAttribute('hero-id', 'user/' + this.user.id + ':name');
-        if (this.hasAttribute('hero')) {
-          this.nameEl.setAttribute('hero', '');
-        }
+    Polymer({
 
-        this.appendChild(this.nameEl);
+      is: 'polyfora-user-ref',
+
+      enableCustomStyleProperties: true,
+
+      properties: {
+        user: Object,
+      },
+
+      listeners: {
+        'tap': '_onTap',
       },
 
       _onTap: function() {
         MoreRouting.navigateTo('user', {userId: this.user.id});
         event.stopPropagation();
-        this.makeHero();
       },
 
-      makeHero: function() {
-        if (this.hasAttribute('hero')) return;
-
-        this.nameEl.setAttribute('hero', '');
-        setTimeout(function() {
-          this.nameEl.removeAttribute('hero');
-        }.bind(this), 500)
-      },
     });
+
   </script>
-</polymer-element>
+
+</dom-module>

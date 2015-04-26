@@ -1,108 +1,136 @@
 <link rel="import" href="../../polymer/polymer.html">
 
-<polymer-element name="polyfora-data" attributes="data">
-  <script>
-  (function() {
-    var LIPSUM = ['a', 'ac', 'accumsan', 'ad', 'adipiscing', 'aliquam', 'aliquet', 'amet', 'ante', 'aptent', 'arcu', 'at', 'auctor', 'augue', 'bibendum', 'blandit', 'class', 'commodo', 'condimentum', 'congue', 'consectetur', 'conubia', 'convallis', 'cras', 'cubilia', 'curae', 'cursus', 'dapibus', 'diam', 'dictum', 'dolor', 'donec', 'dui', 'duis', 'efficitur', 'eget', 'eleifend', 'elit', 'enim', 'erat', 'eros', 'est', 'et', 'eu', 'ex', 'facilisis', 'fames', 'faucibus', 'felis', 'fermentum', 'feugiat', 'finibus', 'fringilla', 'fusce', 'gravida', 'hendrerit', 'himenaeos', 'iaculis', 'id', 'in', 'inceptos', 'interdum', 'ipsum', 'justo', 'lacinia', 'lacus', 'laoreet', 'lectus', 'leo', 'ligula', 'litora', 'lobortis', 'lorem', 'luctus', 'maecenas', 'magna', 'malesuada', 'massa', 'mattis', 'mauris', 'maximus', 'metus', 'mi', 'molestie', 'mollis', 'morbi', 'nam', 'nec', 'neque', 'nibh', 'nisi', 'nisl', 'non', 'nostra', 'nulla', 'nullam', 'nunc', 'odio', 'orci', 'ornare', 'pellentesque', 'per', 'pharetra', 'phasellus', 'placerat', 'porta', 'porttitor', 'posuere', 'potenti', 'praesent', 'pretium', 'primis', 'proin', 'pulvinar', 'purus', 'quam', 'quis', 'quisque', 'rhoncus', 'risus', 'rutrum', 'sagittis', 'sapien', 'scelerisque', 'sed', 'sem', 'semper', 'sit', 'sociosqu', 'sodales', 'sollicitudin', 'suscipit', 'suspendisse', 'taciti', 'tellus', 'tempor', 'tempus', 'tincidunt', 'torquent', 'tortor', 'tristique', 'turpis', 'ullamcorper', 'ultrices', 'ultricies', 'urna', 'ut', 'varius', 'vehicula', 'vel', 'velit', 'venenatis', 'vestibulum', 'vitae', 'vivamus', 'viverra', 'volutpat', 'vulputate'];
-    var PEEPS  = ['Addy O', 'AJ O', 'Arthur E', 'Chris J', 'Daniel F', 'Dimitri G', 'Eric B', 'Frankie F', 'Ian M', 'Justin F', 'Keanu L', 'Kevin S', 'Matt M', 'Rob D', 'Ross A', 'Scott M', 'Steve O', 'Taylor S', 'Yvonne Y'];
+<script>
+(function() {
+  var LIPSUM = ['a', 'ac', 'accumsan', 'ad', 'adipiscing', 'aliquam', 'aliquet', 'amet', 'ante', 'aptent', 'arcu', 'at', 'auctor', 'augue', 'bibendum', 'blandit', 'class', 'commodo', 'condimentum', 'congue', 'consectetur', 'conubia', 'convallis', 'cras', 'cubilia', 'curae', 'cursus', 'dapibus', 'diam', 'dictum', 'dolor', 'donec', 'dui', 'duis', 'efficitur', 'eget', 'eleifend', 'elit', 'enim', 'erat', 'eros', 'est', 'et', 'eu', 'ex', 'facilisis', 'fames', 'faucibus', 'felis', 'fermentum', 'feugiat', 'finibus', 'fringilla', 'fusce', 'gravida', 'hendrerit', 'himenaeos', 'iaculis', 'id', 'in', 'inceptos', 'interdum', 'ipsum', 'justo', 'lacinia', 'lacus', 'laoreet', 'lectus', 'leo', 'ligula', 'litora', 'lobortis', 'lorem', 'luctus', 'maecenas', 'magna', 'malesuada', 'massa', 'mattis', 'mauris', 'maximus', 'metus', 'mi', 'molestie', 'mollis', 'morbi', 'nam', 'nec', 'neque', 'nibh', 'nisi', 'nisl', 'non', 'nostra', 'nulla', 'nullam', 'nunc', 'odio', 'orci', 'ornare', 'pellentesque', 'per', 'pharetra', 'phasellus', 'placerat', 'porta', 'porttitor', 'posuere', 'potenti', 'praesent', 'pretium', 'primis', 'proin', 'pulvinar', 'purus', 'quam', 'quis', 'quisque', 'rhoncus', 'risus', 'rutrum', 'sagittis', 'sapien', 'scelerisque', 'sed', 'sem', 'semper', 'sit', 'sociosqu', 'sodales', 'sollicitudin', 'suscipit', 'suspendisse', 'taciti', 'tellus', 'tempor', 'tempus', 'tincidunt', 'torquent', 'tortor', 'tristique', 'turpis', 'ullamcorper', 'ultrices', 'ultricies', 'urna', 'ut', 'varius', 'vehicula', 'vel', 'velit', 'venenatis', 'vestibulum', 'vitae', 'vivamus', 'viverra', 'volutpat', 'vulputate'];
+  var PEEPS  = ['Addy O', 'AJ O', 'Arthur E', 'Chris J', 'Daniel F', 'Dimitri G', 'Eric B', 'Frankie F', 'Ian M', 'Justin F', 'Keanu L', 'Kevin S', 'Matt M', 'Rob D', 'Ross A', 'Scott M', 'Steve O', 'Taylor S', 'Yvonne Y'];
 
-    Polymer('polyfora-data', {
+  Polymer({
 
-      ready: function() {
-        this.data       = this;
-        this.users      = this._generateUsers();
-        this.usersById  = idMap(this.users);
-        this.forums     = this._generateForums();
-        this.forumsById = idMap(this.forums);
-      },
+    is: 'polyfora-data',
 
-      _generateUsers: function() {
-        return PEEPS.map(function(name) {
-          return {
-            id:   slug(name),
-            name: name,
-          }
-        });
-      },
+    properties: {
 
-      _generateForums: function() {
-        return generate(3, function() {
-          var title   = phrase(4);
-          var threads = this._generateThreads();
-
-          return {
-            id:          slug(title),
-            title:       title,
-            desc:        paragraph(5),
-            threads:     threads,
-            threadsById: idMap(threads),
-          }
-        }.bind(this));
-      },
-
-      _generateThreads: function() {
-        return generate(rand(3, 15), function() {
-          var title  = phrase(6);
-          var author = pick(this.users)
-
-          return {
-            id:     slug(title),
-            title:  title,
-            author: author,
-            posts:  this._generatePosts(author),
-          };
-        }.bind(this));
-      },
-
-      _generatePosts: function(initialAuthor) {
-        return generate(rand(1, 5), function(i) {
-          return {
-            body:   paragraph(5),
-            author: i === 0 ? initialAuthor : pick(this.users),
-          };
-        }.bind(this));
-      },
-
-    });
-
-    function rand(min, max) {
-      return Math.round(Math.random() * (max - min) + min);
-    }
-
-    function pick(array) {
-      return array[Math.floor(Math.random() * array.length)];
-    }
-
-    function phrase(size) {
-      var words = generate(rand(size / 2, size), pick.bind(null, LIPSUM));
-      words[0] = words[0].substr(0, 1).toUpperCase() + words[0].substr(1);
-      return words.join(' ');
-    }
-
-    function paragraph(size) {
-      return generate(rand(size / 2, size), phrase.bind(null, 10)).join('. ');
-    }
-
-    function slug(string) {
-      return string.toLowerCase().replace(/[^a-z]+/g, '-');
-    }
-
-    function generate(times, callback) {
-      var result = [];
-      for (var i = 0; i < times; i++) {
-        result.push(callback(i));
+      /**
+       * A reference to this element, for easy binding.
+       *
+       * @see #ready for the properties it exposes.
+       */
+      data: {
+        type:   Object,
+        notify: true,
       }
-      return result;
-    }
 
-    function idMap(items) {
-      var result = {};
-      for (var i = 0, item; item = items[i]; i++) {
-        result[item.id] = item;
-      }
-      return result;
-    }
+    },
 
-  })();
-  </script>
-</polymer-element>
+    ready: function() {
+      this.data       = this;
+      this.users      = this._generateUsers();
+      this.usersById  = idMap(this.users);
+      this.forums     = this._generateForums();
+      this.forumsById = idMap(this.forums);
+    },
+
+    _generateUsers: function() {
+      return PEEPS.map(function(name) {
+        return {
+          id:   slug(name),
+          name: name,
+        }
+      });
+    },
+
+    _generateForums: function() {
+      return generate(3, function() {
+        var title   = phrase(4);
+        var threads = this._generateThreads();
+
+        return {
+          id:          slug(title),
+          title:       title,
+          desc:        paragraph(5),
+          threads:     threads,
+          threadsById: idMap(threads),
+        }
+      }.bind(this));
+    },
+
+    _generateThreads: function() {
+      return generate(rand(3, 15), function() {
+        var title  = phrase(6);
+        var author = pick(this.users);
+
+        return {
+          id:     slug(title),
+          title:  title,
+          author: author,
+          posts:  this._generatePosts(author),
+        };
+      }.bind(this));
+    },
+
+    _generatePosts: function(initialAuthor) {
+      return generate(rand(1, 5), function(i) {
+        return {
+          body:   paragraph(5),
+          author: i === 0 ? initialAuthor : pick(this.users),
+        };
+      }.bind(this));
+    },
+
+  });
+
+  // A simple RNG where we can specify the seed.
+  //
+  // Via http://en.wikipedia.org/wiki/Random_number_generation and
+  // https://groups.google.com/forum/#!topic/sci.crypt/yoaCpGWKEk0
+  // (the MWC example of the latter)
+  var seedW = 27272727;
+  var seedZ = 12345678;
+  function genRand() {
+    seedZ = 36969 * (seedZ & 65535) + (seedZ >> 16);
+    seedW = 18000 * (seedW & 65535) + (seedW >> 16);
+    // Modified to return 0.0 >= value >= 1.0
+    return (((seedZ << 16) + seedW + 2147483648) % 4294967296) / 4294967296;
+  }
+
+  function rand(min, max) {
+    return Math.round(genRand() * (max - min) + min);
+  }
+
+  function pick(array) {
+    return array[Math.floor(genRand() * array.length)];
+  }
+
+  function phrase(size) {
+    var words = generate(rand(size / 2, size), pick.bind(null, LIPSUM));
+    words[0] = words[0].substr(0, 1).toUpperCase() + words[0].substr(1);
+    return words.join(' ');
+  }
+
+  function paragraph(size) {
+    return generate(rand(size / 2, size), phrase.bind(null, 10)).join('. ');
+  }
+
+  function slug(string) {
+    return string.toLowerCase().replace(/[^a-z]+/g, '-');
+  }
+
+  function generate(times, callback) {
+    var result = [];
+    for (var i = 0; i < times; i++) {
+      result.push(callback(i));
+    }
+    return result;
+  }
+
+  function idMap(items) {
+    var result = {};
+    for (var i = 0, item; item = items[i]; i++) {
+      result[item.id] = item;
+    }
+    return result;
+  }
+
+})();
+</script>

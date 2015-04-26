@@ -41,6 +41,10 @@
       var node = this;
       while (node) {
         node = Polymer.dom(node).parentNode;
+        if (node && node.nodeType !== Node.ELEMENT_NODE) {
+          node = node.host;
+        }
+
         var route = node && node.moreRouteContext;
         if (route instanceof MoreRouting.Route) {
           return route;
