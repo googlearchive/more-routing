@@ -2,7 +2,6 @@
   "name": "more-routing",
   "version": "0.8.0",
   "authors": [
-    "Ian MacLeod <ian@nevir.net>",
     "The Polymer Authors"
   ],
   "description": "A composable suite of objects and elements to make routing with web components a breeze.",
@@ -14,11 +13,11 @@
     "router"
   ],
   "main": "more-routing.html",
-  "license": "MIT",
+  "license": "http://polymer.github.io/LICENSE.txt",
   "homepage": "https://github.com/PolymerLabs/more-routing/",
   "ignore": [
     "/.*",
-    "/tests/",
+    "/test/",
     "/demo/"
   ],
   "dependencies": {
