@@ -27,8 +27,11 @@
   "devDependencies": {
     "iron-doc-viewer": "PolymerElements/iron-doc-viewer#^0.8.5",
     "iron-selector": "PolymerElements/iron-selector#^0.8.2",
-    "paper-styles": "PolymerElements/paper-styles#^0.8.3",
-    "paper-styles": "PolymerElements/paper-styles#^0.8.6",
+    "paper-styles": "PolymerElements/paper-styles#^0.8.9",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^0.8.1",
     "web-component-tester": "*"
+  },
+  "resolutions": {
+    "observe-js": "0.5.6-rc1"
   }
 }
