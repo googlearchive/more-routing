@@ -23,12 +23,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     header {
-      mixin(--paper-font-headline);
+      @apply(--paper-font-headline);
     }
 
     /* faux-tabs until we have paper-tabs */
     iron-selector .tab {
-      mixin(--paper-font-body1);
+      @apply(--paper-font-body1);
       display: inline-block;
       padding: 8px;
       border-bottom: 2px solid transparent;
@@ -44,7 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <more-route context name="user" params="{{params}}"></more-route>
 
-    <header>{{_user.name}}</header>
+    <header>[[_user.name]]</header>
 
     <!--
     If your more-route-selector contains routes without any params, it can also
@@ -66,8 +66,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
 
       is: 'polyfora-user',
-
-      enableCustomStyleProperties: true,
 
       properties: {
         data: Object,

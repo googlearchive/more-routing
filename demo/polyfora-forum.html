@@ -25,12 +25,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     header {
-      mixin(--paper-font-headline);
+      @apply(--paper-font-headline);
     }
 
     .headers {
-      mixin(--paper-font-caption);
-      mixin(--layout-horizontal);
+      @apply(--paper-font-caption);
+      @apply(--layout-horizontal);
       margin-bottom: -8px;
     }
     .headers > * {
@@ -38,16 +38,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     .title {
-      mixin(--layout-flex);
+      @apply(--layout-flex);
     }
     .author {
       width: 80px;
     }
 
     .thread {
-      mixin(--shadow-elevation-1);
-      mixin(--layout-horizontal);
-      mixin(--paper-font-subhead);
+      @apply(--shadow-elevation-2dp);
+      @apply(--layout-horizontal);
+      @apply(--paper-font-subhead);
       margin: 8px 0;
       cursor: pointer;
     }
@@ -68,11 +68,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="author">Author</div>
     </section>
 
-    <template is="x-repeat" items="{{_forum.threads}}">
-      <section class="thread" layout horizontal center on-tap="_onThreadTapped" thread-id$="{{item.id}}">
-        <div class="title">{{item.title}}</div>
-        <div class="posts">{{item.posts.length}}</div>
-        <polyfora-user-ref class="author" user="{{item.author}}"></polyfora-user-ref>
+    <template is="dom-repeat" items="[[_forum.threads]]" as="thread">
+      <section class="thread" layout horizontal center on-tap="_onThreadTapped" thread-id$="[[thread.id]]">
+        <div class="title">[[thread.title]]</div>
+        <div class="posts">[[thread.posts.length]]</div>
+        <polyfora-user-ref class="author" user="[[thread.author]]"></polyfora-user-ref>
       </section>
     </template>
   </template>
@@ -82,8 +82,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
 
       is: 'polyfora-forum',
-
-      enableCustomStyleProperties: true,
 
       properties: {
 

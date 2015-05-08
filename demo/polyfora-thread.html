@@ -25,21 +25,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     header {
-      mixin(--paper-font-headline);
+      @apply(--paper-font-headline);
     }
 
     .byline {
-      mixin(--paper-font-caption);
+      @apply(--paper-font-caption);
       margin-top:    -8px;
       margin-bottom: 8px;
     }
 
     .posts {
-      mixin(--shadow-elevation-1);
+      @apply(--shadow-elevation-2dp);
     }
 
     .post {
-      mixin(--layout-horizontal);
+      @apply(--layout-horizontal);
       border-top:    1px solid #eeeeee;
       border-bottom: 1px solid #eeeeee;
       padding: 8px 16px;
@@ -52,8 +52,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     .post .body {
-      mixin(--layout-flex);
-      mixin(--paper-font-body1);
+      @apply(--layout-flex);
+      @apply(--paper-font-body1);
     }
 
     .post .author {
@@ -67,13 +67,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <more-route context name="thread" params="{{params}}"></more-route>
 
     <header>{{_thread.title}}</header>
-    <div class="byline"><span>by </span><polyfora-user-ref user="{{_thread.author}}" hero></polyfora-user-ref></div>
+    <div class="byline"><span>by </span><polyfora-user-ref user="[[_thread.author]]" hero></polyfora-user-ref></div>
 
     <section class="posts">
-      <template is="x-repeat" items="{{_thread.posts}}">
+      <template is="dom-repeat" items="[[_thread.posts]]" as="post">
         <section class="post" layout horizontal cross-fade>
-          <div class="body" flex>{{item.body}}</div>
-          <polyfora-user-ref class="author" user="{{item.author}}"></polyfora-user-ref>
+          <div class="body" flex>[[post.body]]</div>
+          <polyfora-user-ref class="author" user="[[post.author]]"></polyfora-user-ref>
         </section>
       </template>
     </section>
@@ -84,8 +84,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
 
       is: 'polyfora-thread',
-
-      enableCustomStyleProperties: true,
 
       observers: [
         '_threadChanged(params.forumId, params.threadId, data)',
