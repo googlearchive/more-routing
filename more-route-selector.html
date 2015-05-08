@@ -127,6 +127,7 @@ Polymer({
    * defined by the current URL.
    */
   _onSelectedItemChanged: function(event) {
+    if (this._settingSelection) return;
     var route = this._routeForItem(event.detail.value);
     if (!route) return;
     route.navigateTo();
@@ -143,7 +144,11 @@ Polymer({
   _onMoreRouteChange: function(event) {
     if (!this._managedSelector) return;
     var route = event.detail.newRoute;
+
+    // Make sure that we don't turn around and re-navigate
+    this._settingSelection = true;
     this._managedSelector.select(this.routes.indexOf(route));
+    this._settingSelection = false;
   },
 
   _findTargetSelector: function() {
