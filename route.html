@@ -6,6 +6,7 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+<link rel="import" href="emitter.html">
 <link rel="import" href="params.html">
 
 <script>
@@ -24,6 +25,9 @@ var SEPARATOR_CLEANER = /\/\/+/g;
  * TODO(nevir): Docs.
  */
 function Route(path, parent) {
+  // For `MoreRouting.Emitter`; Emits changes for `active`.
+  this.__listeners = [];
+
   this.path     = path;
   this.parent   = parent;
   this.fullPath = path;
@@ -55,6 +59,18 @@ function Route(path, parent) {
     this.numParams = countParams(this.compiled);
   }
 }
+Route.prototype = Object.create(MoreRouting.Emitter);
+
+Object.defineProperty(Route.prototype, 'active', {
+  get: function() {
+    return this._active;
+  },
+  set: function(value) {
+    if (value !== this._active);
+    this._active = value;
+    this.__notify('active', value);
+  },
+});
 
 Route.isPath = function isPath(pathOrName) {
   return pathOrName.indexOf(PART_SEPARATOR) === 0;
