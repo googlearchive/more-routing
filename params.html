@@ -6,6 +6,8 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+<link rel="import" href="emitter.html">
+
 <script>
 (function(scope) {
 var MoreRouting = scope.MoreRouting = scope.MoreRouting || {};
@@ -32,68 +34,7 @@ function Params(params, parent) {
 
   return model;
 }
-Params.prototype = Object.create(null); // Minimal set of properties.
-
-// Ensure that all prototype properties are non-enumerable
-Object.defineProperties(Params.prototype, {
-
-  // Event Handling
-
-  /**
-   * Registers a callback that will be called each time any parameter managed by
-   * this object (or its parents) have changed.
-   *
-   * @param {function(string, string, !Params)} callback
-   * @return {{close: function()}}
-   */
-  __subscribe: {
-    value: function __subscribe(callback) {
-      this.__listeners.push(callback);
-
-      return {
-        close: this.__unsubscribe.bind(this, callback),
-      };
-    },
-  },
-
-  /**
-   * Unsubscribes a previously registered callback.
-   *
-   * @param {function(string, string, !Params)} callback
-   */
-  __unsubscribe: {
-    value: function __unsubscribe(callback) {
-      var index = this.__listeners.indexOf(callback);
-      if (index < 0) {
-        console.warn(this, 'attempted unsubscribe of unregistered listener:', callback);
-        return;
-      }
-      this.__listeners.splice(index, 1);
-    },
-  },
-
-  /**
-   * Notifies of a param change.
-   *
-   * @param {string} key
-   * @param {string} value
-   */
-  __notify: {
-    value: function __notify(key, value) {
-      if (this.__silent) return;
-      // Notify listeners on parents first.
-      var parent = Object.getPrototypeOf(this);
-      if (parent && parent.__notify && parent.__listeners) {
-        parent.__notify(key, value);
-      }
-
-      this.__listeners.forEach(function(listener) {
-        listener(key, value, this);
-      }.bind(this))
-    },
-  },
-
-});
+Params.prototype = Object.create(MoreRouting.Emitter);
 
 // Utility
 
