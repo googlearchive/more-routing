@@ -19,13 +19,11 @@ MoreRouting.Emitter = Object.create(null);  // Minimal set of properties.
  */
 Object.defineProperties(MoreRouting.Emitter, {
 
-  // Event Handling
-
   /**
    * Registers a callback that will be called each time any parameter managed by
    * this object (or its parents) have changed.
    *
-   * @param {function(string, string, !Params)} callback
+   * @param {!Function} callback
    * @return {{close: function()}}
    */
   __subscribe: {
@@ -41,7 +39,7 @@ Object.defineProperties(MoreRouting.Emitter, {
   /**
    * Unsubscribes a previously registered callback.
    *
-   * @param {function(string, string, !Params)} callback
+   * @param {!Function} callback
    */
   __unsubscribe: {
     value: function __unsubscribe(callback) {
