@@ -1,0 +1,116 @@
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<script>
+(function(scope) {
+var MoreRouting = scope.MoreRouting = scope.MoreRouting || {};
+MoreRouting.Params = Params;
+
+/**
+ * A collection of route parameters and their values, with nofications.
+ *
+ * Params prefixed by `__` are reserved.
+ *
+ * @param {!Array<string>} params The keys of the params being managed.
+ * @param {Params=} parent A parent route's params to inherit.
+ * @return {Params}
+ */
+function Params(params, parent) {
+  var model = Object.create(parent || Params.prototype);
+  // We have a different set of listeners at every level of the hierarchy.
+  Object.defineProperty(model, '__listeners', {value: []});
+
+  // We keep all state enclosed within this closure so that inheritance stays
+  // relatively straightfoward.
+  var state = {};
+  _compile(model, params, state);
+
+  return model;
+}
+Params.prototype = Object.create(null); // Minimal set of properties.
+
+// Ensure that all prototype properties are non-enumerable
+Object.defineProperties(Params.prototype, {
+
+  // Event Handling
+
+  /**
+   * Registers a callback that will be called each time any parameter managed by
+   * this object (or its parents) have changed.
+   *
+   * @param {function(string, string, !Params)} callback
+   * @return {{close: function()}}
+   */
+  __subscribe: {
+    value: function __subscribe(callback) {
+      this.__listeners.push(callback);
+
+      return {
+        close: this.__unsubscribe.bind(this, callback),
+      };
+    },
+  },
+
+  /**
+   * Unsubscribes a previously registered callback.
+   *
+   * @param {function(string, string, !Params)} callback
+   */
+  __unsubscribe: {
+    value: function __unsubscribe(callback) {
+      var index = this.__listeners.indexOf(callback);
+      if (index < 0) {
+        console.warn(this, 'attempted unsubscribe of unregistered listener:', callback);
+        return;
+      }
+      this.__listeners.splice(index, 1);
+    },
+  },
+
+  /**
+   * Notifies of a param change.
+   *
+   * @param {string} key
+   * @param {string} value
+   */
+  __notify: {
+    value: function __notify(key, value) {
+      if (this.__silent) return;
+      // Notify listeners on parents first.
+      var parent = Object.getPrototypeOf(this);
+      if (parent && parent.__notify && parent.__listeners) {
+        parent.__notify(key, value);
+      }
+
+      this.__listeners.forEach(function(listener) {
+        listener(key, value, this);
+      }.bind(this))
+    },
+  },
+
+});
+
+// Utility
+
+function _compile(model, params, state) {
+  params.forEach(function(param) {
+    Object.defineProperty(model, param, {
+      get: function() {
+        return state[param];
+      },
+      set: function(value) {
+        if (state[param] === value) return;
+        state[param] = value;
+        model.__notify(param, value);
+      },
+    });
+  });
+}
+
+})(window);
+</script>
