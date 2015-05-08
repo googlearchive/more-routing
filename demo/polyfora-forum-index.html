@@ -25,19 +25,19 @@ A page of Polyfora, describing all available forums.
     }
 
     header {
-      mixin(--paper-font-caption);
+      @apply(--paper-font-caption);
     }
 
     .forum {
-      mixin(--shadow-elevation-1);
-      mixin(--paper-font-body1);
+      @apply(--shadow-elevation-2dp);
+      @apply(--paper-font-body1);
       margin: 8px 0;
       padding: 8px;
       cursor: pointer;
     }
 
     .forum .title {
-      mixin(--paper-font-title);
+      @apply(--paper-font-title);
     }
 
     .description {
@@ -51,10 +51,10 @@ A page of Polyfora, describing all available forums.
 
     <header>Forums</header>
 
-    <template is="x-repeat" items="{{_forumList}}">
-      <section class="forum" on-tap="_onForumTapped" forum-id$="{{item.id}}">
-        <header class="title">{{item.title}}</header>
-        <div class="description">{{item.desc}}</div>
+    <template is="dom-repeat" items="[[_forumList]]" as="forum">
+      <section class="forum" on-tap="_onForumTapped" forum-id$="[[forum.id]]">
+        <header class="title">[[forum.title]]</header>
+        <div class="description">[[forum.desc]]</div>
       </section>
     </template>
 
@@ -72,8 +72,6 @@ A page of Polyfora, describing all available forums.
 
       is: 'polyfora-forum-index',
 
-      enableCustomStyleProperties: true,
-
       properties: {
 
         data: {
@@ -84,9 +82,8 @@ A page of Polyfora, describing all available forums.
       },
 
       _dataChanged: function() {
-        this._forumList = [];
-        Object.keys(this.data.forums).forEach(function(id) {
-          this._forumList.push(this.data.forums[id]);
+        this._forumList = Object.keys(this.data.forums).map(function(id) {
+          return this.data.forums[id];
         }.bind(this));
       },
 

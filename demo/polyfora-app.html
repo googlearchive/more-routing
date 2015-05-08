@@ -33,7 +33,7 @@ The top level element for Polyfora.
     }
 
     header {
-      mixin(--paper-font-display2);
+      @apply(--paper-font-display2);
       background-color: var(--theme-primary);
       color: white;
       padding: 16px;
@@ -63,12 +63,12 @@ The top level element for Polyfora.
 
     See each page's `<more-route context ...>`.
     -->
-    <more-route-selector selected-params="{{_params}}">
+    <more-route-selector>
       <iron-selector>
-        <polyfora-forum-index data="{{_demoData}}"></polyfora-forum-index>
-        <polyfora-user        data="{{_demoData}}"></polyfora-user>
-        <polyfora-forum       data="{{_demoData}}"></polyfora-forum>
-        <polyfora-thread      data="{{_demoData}}"></polyfora-thread>
+        <polyfora-forum-index data="[[_demoData]]"></polyfora-forum-index>
+        <polyfora-user        data="[[_demoData]]"></polyfora-user>
+        <polyfora-forum       data="[[_demoData]]"></polyfora-forum>
+        <polyfora-thread      data="[[_demoData]]"></polyfora-thread>
       </iron-selector>
     </more-route-selector>
 
@@ -79,8 +79,6 @@ The top level element for Polyfora.
     Polymer({
 
       is: 'polyfora-app',
-
-      enableCustomStyleProperties: true,
 
       /**
        * Navigates to the root URL, in response to a tap on the home "link".
