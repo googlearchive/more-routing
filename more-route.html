@@ -158,7 +158,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     _observeRoute: function() {
       // TODO(nevir) https://github.com/Polymore/more-routing/issues/24
       if (this._routeObserver) this._routeObserver.close();
-      if (this._paramObserver) this._paramObserver.close();
+      if (this._paramListener) {
+        this._paramListener.close();
+        this._paramListener = null;
+      }
       if (!this.route) return;
 
       this._routeObserver = new CompoundObserver();
@@ -167,12 +170,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._setActive(this.route.active);
       }.bind(this));
 
-      this._paramObserver = new ObjectObserver(this.route.params);
-      this._paramObserver.open(function(added, removed, changed, getOldValue) {
-        var keys = Object.keys(added).concat(Object.keys(removed)).concat(Object.keys(changed));
-        keys.forEach(function(key) {
-          this.notifyPath('params.' + key, this.params[key]);
-        }.bind(this));
+      this._paramListener = this.route.params.__subscribe(function(key, value) {
+        // https://github.com/Polymer/polymer/issues/1505
+        this.notifyPath('params.' + key, value);
       }.bind(this));
     },
 
