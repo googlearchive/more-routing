@@ -143,14 +143,14 @@ Polymer({
   _onMoreRouteChange: function(event) {
     if (!this._managedSelector) return;
     var index = this.routes.indexOf(event.detail.newRoute);
-    var selected;
-    if (this._managedSelector.attrForSelected) {
-      selected = this._managedSelector.items[index].getAttribute(
-          this._managedSelector.attrForSelected);
-    } else {
-      selected = index;
+    var attrForSelected = this._managedSelector.attrForSelected;
+    if (!attrForSelected) {
+      this._managedSelector.select(index);
+      return;
     }
-    this._managedSelector.select(selected);
+    var item = this._managedSelector.items[index];
+    this._managedSelector.select(
+        item[attrForSelected] || item.getAttribute(attrForSelected));
   },
 
   _findTargetSelector: function() {
