@@ -142,8 +142,15 @@ Polymer({
 
   _onMoreRouteChange: function(event) {
     if (!this._managedSelector) return;
-    var route = event.detail.newRoute;
-    this._managedSelector.select(this.routes.indexOf(route));
+    var index = this.routes.indexOf(event.detail.newRoute);
+    var selected;
+    if (this._managedSelector.attrForSelected) {
+      selected = this._managedSelector.items[index].getAttribute(
+          this._managedSelector.attrForSelected);
+    } else {
+      selected = index;
+    }
+    this._managedSelector.select(selected);
   },
 
   _findTargetSelector: function() {
