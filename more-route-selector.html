@@ -143,11 +143,22 @@ Polymer({
 
   _onMoreRouteChange: function(event) {
     if (!this._managedSelector) return;
-    var route = event.detail.newRoute;
+
+    var selected = '';
+
+    var index = this.routes.indexOf(event.detail.newRoute);
+    var attrForSelected = this._managedSelector.attrForSelected;
+    if (!attrForSelected) {
+      selected = index;
+    } else {
+      var item = this._managedSelector.items[index];
+      if (item)
+        selected = item[attrForSelected] || item.getAttribute(attrForSelected);
+    }
 
     // Make sure that we don't turn around and re-navigate
     this._settingSelection = true;
-    this._managedSelector.select(this.routes.indexOf(route));
+    this._managedSelector.select(selected);
     this._settingSelection = false;
   },
 
