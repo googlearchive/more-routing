@@ -117,7 +117,7 @@ Polymer({
 
     this._managedSelector.addEventListener(
         'selected-item-changed', this._onSelectedItemChanged.bind(this));
-    this._updateRoutes();
+    this.async(this._updateRoutes);
   },
 
   /**
