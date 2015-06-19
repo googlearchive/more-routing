@@ -31,7 +31,7 @@ Or, TL;DR:
 </more-route>
 
 <more-route-selector selectedParams="{{params}}">
-  <core-pages>
+  <iron-pages>
     <section route="/">
       This is the index.
     </section>
@@ -47,7 +47,7 @@ Or, TL;DR:
         All the details about {{params.userId}} that you didn't want to know...
       </template>
     </section>
-  </core-pages>
+  </iron-pages>
 </more-route-selector>
 ```
 
@@ -125,23 +125,23 @@ that contains them by setting the `context` attribute. See the
 
 _Defined in [`more-route-selector.html`](more-route-selector.html)._
 
-Manages a [`<core-selector>`](https://www.polymer-project.org/docs/elements/core-elements.html#core-selector)
+Manages a [`<iron-selector>`](https://elements.polymer-project.org/elements/iron-selector)
 (or anything that extends it/looks like one), where each item in the selector
 have an associated route. The most specific route that is active will be
 selected.
 
 ```html
 <more-route-selector>
-  <core-pages>
+  <iron-pages>
     <section route="/">The index!</section>
     <section route="user">A user (named route)</section>
     <section route="/about">Another route</section>
-  </core-pages>
+  </iron-pages>
 </more-route-selector>
 ```
 
 By default, `more-route-selector` will look for the `route` attribute on any
-children of the `core-selector` (change this via `routeAttribute`).
+children of the `iron-selector` (change this via `routeAttribute`).
 
 It exposes information about the selected route via a few properties:
 
@@ -173,10 +173,10 @@ for your element. For example:
 
 ```html
 <more-route-selector>
-  <core-pages>
+  <iron-pages>
     <section route="/">The index!</section>
     <routed-element></routed-element>
-  </core-pages>
+  </iron-pages>
 </more-route-selector>
 ```
 
@@ -188,7 +188,7 @@ whenever the path begins with `/my/route`. Keep it DRY!
 ### Nesting Contexts
 
 Similar to [`more-route`'s nesting behavior](#more-route--nesting), any items in
-the core-selector also behave as nesting contexts. Any route declared within a
+the iron-selector also behave as nesting contexts. Any route declared within a
 routing context is effectively _mounted_ on the context route.
 
 Taking the example element, `<routed-element>` above; if we were to add the
