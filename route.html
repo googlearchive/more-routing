@@ -168,7 +168,7 @@ Route.prototype.processPathParts = function processPathParts(parts) {
 
 Route.prototype.matchesPathParts = function matchesPathParts(parts) {
   if (!parts) return false;
-  if (parts.length < this.compiled.length) return false;
+  if (parts.length !== this.compiled.length) return false;
   for (var i = 0, config; config = this.compiled[i]; i++) {
     if (config.type === 'static' && parts[i] !== config.part) {
       return false;
