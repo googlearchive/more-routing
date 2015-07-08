@@ -21,10 +21,6 @@ TODO(nevir): Support child addition/removal/reorder.
     <more-route-selection
         id="selection"
         routes="[[routes]]"
-        selected-route="{{selectedRoute}}"
-        selected-index="{{selectedIndex}}"
-        selected-path="{{selectedPath}}"
-        selected-params="{{selectedParams}}"
         on-more-route-change="_onMoreRouteChange">
     </more-route-selection>
     <content></content>
@@ -160,6 +156,12 @@ Polymer({
         selected = item[attrForSelected] || item.getAttribute(attrForSelected);
     }
 
+    this._setSelectedRoute(detail.newRoute);
+    this._setSelectedIndex(detail.newIndex);
+    this._setSelectedPath(detail.newPath);
+    this._setSelectedParams();
+    this._setSelectedParams(detail.newParams);
+    
     // Make sure that we don't turn around and re-navigate
     this._settingSelection = true;
     this._managedSelector.select(selected);
