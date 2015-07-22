@@ -9,7 +9,6 @@ a breeze.
 * [Named routes](#more-routing).
 * [Nested (mounted) routes](#more-route--nesting).
 * [Declarative route switching](#more-route-switch).
-* [Polymer helpers](#polymer-helpers--filters) for easy integration into existing elements.
 
 [Rob Dodson](https://github.com/robdodson) has whipped up a great video
 that can get you started with more-routing:
@@ -205,38 +204,6 @@ hierarchy_. Very handy for composable components!
 
 **Note:** All items in a `<more-route-selector>` are treated as routing
 contexts!
-
-
-<a name="polymer-helpers"></a>
-Polymer Helpers
----------------
-
-<a name="polymer-helpers--filters"></a>
-### Filters
-
-_Defined in [`polymer-expressions.html`](polymer-expressions.html)._
-
-Several filters (functions) are exposed to templates for your convenience:
-
-#### `route`
-
-You can fetch a `MoreRouting.Route` object via the `route` filter. Handy for
-reading params, etc on the fly.
-
-```html
-<x-user model="{{ route('user').params }}"></x-user>
-```
-
-**Note:** The `route()` helper is unfortunately _not_ aware of the current
-routing context. Consider using only named routes to avoid confusion!
-
-#### `urlFor`
-
-Generates a URL for the specified route and params:
-
-```html
-<a href="{{ urlFor('user', {userId: 1}) }}">User 1</a>
-```
 
 
 JavaScript API
