@@ -150,7 +150,9 @@ Route.prototype.processPathParts = function processPathParts(parts) {
   if (this.active) {
     var keys = Object.keys(this.params);
     for (var i = 0; i < keys.length; i++) {
-      delete this.params[keys[i]];
+      if (keys[i] !== '__silent') {
+        delete this.params[keys[i]];
+      }
     }
     for (var i = 0, config; config = this.compiled[i]; i++) {
       if (config.type === 'param') {
