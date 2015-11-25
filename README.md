@@ -1,3 +1,11 @@
+## NOTE: This router is not currently actively maintained by the Polymer core team. 
+
+Our aim is to create a more integrated product line of components for structuring applications, where each is tightly scoped. 
+
+Generally, the [PolymerLabs/](https://github.com/polymerlabs) organization is used as a testing ground for components - those that will be supported and continue to evolve long-term will be in the [PolymerElements/](https://github.com/polymerelements) organization.
+
+If anyone would be interested in evolving this particular component long-term, please let @tjsavage know!
+
 Routing
 =======
 
