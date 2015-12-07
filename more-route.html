@@ -132,10 +132,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     _routeChanged: function() {
       this._observeRoute();
-      this._setFullPath(this.route.fullPath);
-      // this._setParams(this.route.params);
-      this.params = this.route.params;
-      this._setActive(this.route.active);
+      if (this.route) {
+        this._setFullPath(this.route.fullPath);
+        // this._setParams(this.route.params);
+        this.params = this.route.params;
+        this._setActive(this.route.active);
+      } else {
+        this._setFullPath(null);
+        this.params = null;
+        this._setActive(false);
+      }
 
       // @see MoreRouting.ContextAware
       this.moreRouteContext = this.route;
