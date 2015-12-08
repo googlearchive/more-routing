@@ -146,6 +146,8 @@ Polymer({
   },
 
   _onMoreRouteChange: function(event) {
+    this._setSelectedRoute(event.detail.newRoute);
+
     if (!this._managedSelector) return;
 
     var selected = '';
