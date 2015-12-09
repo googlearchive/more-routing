@@ -113,6 +113,10 @@ Polymer({
    */
 
   attached: function() {
+    this.async(this._initialize)
+  },
+
+  _initialize: function() {
     this._managedSelector = this._findTargetSelector();
     if (!this._managedSelector) {
       console.warn(this, 'was built without a selector to manage. It will do nothing.');
