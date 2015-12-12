@@ -154,12 +154,14 @@ TODO(nevir): Document.
       this._setSelectedPath(newPath);
       this._setSelectedParams(newParams);
 
-      this.fire('more-route-change', {
-        newRoute:  newRoute,  oldRoute:  oldRoute,
-        newIndex:  newIndex,  oldIndex:  oldIndex,
-        newPath:   newPath,   oldPath:   oldPath,
-        newParams: newParams, oldParams: oldParams,
-      });
+      this.debounce('fire-more-route-change', function() {
+        this.fire('more-route-change', {
+          newRoute:  newRoute,  oldRoute:  oldRoute,
+          newIndex:  newIndex,  oldIndex:  oldIndex,
+          newPath:   newPath,   oldPath:   oldPath,
+          newParams: newParams, oldParams: oldParams,
+        });
+      }, 100);
     },
     /**
      * We want the most specific routes to match first, so we must create a

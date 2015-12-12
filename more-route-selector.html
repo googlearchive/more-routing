@@ -121,6 +121,7 @@ Polymer({
 
     this._managedSelector.addEventListener(
         'selected-item-changed', this._onSelectedItemChanged.bind(this));
+    this._managedSelector.addEventListener('iron-items-changed', this._updateRoutes.bind(this));
     this._updateRoutes();
   },
 
