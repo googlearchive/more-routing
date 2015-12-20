@@ -27,6 +27,10 @@ Driver.prototype.manageRoute = function manageRoute(route) {
   route.driver = this;
   this._appendRoute(route);
 
+  // We don't want to notify of these changes; they might stop
+  // the activation of child routes during initialization
+  route.params.__silent = true;
+
   if (route.parent) {
     if (route.parent.active) {
       // Remember: `processPathParts` takes just the path parts relative to that
@@ -38,6 +42,8 @@ Driver.prototype.manageRoute = function manageRoute(route) {
   }
 
   if (route.active) this._activeRoutes.push(route);
+
+  delete route.params.__silent;
 };
 
 Driver.prototype.urlForParts = function urlForParts(parts) {
